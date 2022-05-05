@@ -1,0 +1,237 @@
+2022.05.05 16:53:12 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.05.05 16:53:13 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.05.05 16:53:13 INFO  Started: Metals version 0.11.5 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.05.05 16:53:14 INFO  time: initialize in 1.31s[0m
+2022.05.05 16:53:14 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.05.05 16:53:14 WARN  Build server is not auto-connectable.[0m
+2022.05.05 16:53:15 WARN  no build target for: /mnt/data/projects/npu/EasyNPU/build.sbt[0m
+2022.05.05 17:17:00 INFO  no build target found for /mnt/data/projects/npu/EasyNPU/build.sbt. Using presentation compiler with project's scala-library version: 3.1.2[0m
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 2
+2022.05.05 17:17:02 WARN  no build target for: /mnt/data/projects/npu/EasyNPU/build.sbt[0m
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 7
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 4
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 5
+2022.05.05 17:17:02 WARN  no build target for: /mnt/data/projects/npu/EasyNPU/build.sbt[0m
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 6
+2022.05.05 17:17:02 WARN  no build target for: /mnt/data/projects/npu/EasyNPU/build.sbt[0m
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 16
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 18
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 14
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 22
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 23
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 13
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 21
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 20
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 27
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 28
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 30
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 33
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 31
+2022.05.05 17:17:02 WARN  no build target for: /mnt/data/projects/npu/EasyNPU/build.sbt[0m
+2022.05.05 17:17:02 INFO  running '/usr/local/jdk1.8/bin/java -Djline.terminal=jline.UnsupportedTerminal -Dsbt.log.noformat=true -Dfile.encoding=UTF-8 -Dsbt.version=1.6.2 -jar /tmp/metals691688990432324491/sbt-launch.jar -Dbloop.export-jar-classifiers=sources bloopInstall'[0m
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 19
+2022.05.05 17:17:02 WARN  no build target for: /mnt/data/projects/npu/EasyNPU/build.sbt[0m
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 36
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 35
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 40
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 41
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 34
+May 05, 2022 5:17:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 38
+2022.05.05 17:17:02 INFO  skipping build import with status 'Started'[0m
+2022.05.05 17:17:02 ERROR [info] [launcher] getting org.scala-sbt sbt 1.6.2  (this may take some time)...[0m
+2022.05.05 17:17:02 WARN  no build target for: /mnt/data/projects/npu/EasyNPU/project/metals.sbt[0m
+2022.05.05 17:17:02 WARN  no build target for: /mnt/data/projects/npu/EasyNPU/project/project/metals.sbt[0m
+2022.05.05 17:17:08 INFO  skipping build import with status 'Started'[0m
+2022.05.05 17:17:15 INFO  running '/usr/local/jdk1.8/bin/java -Djline.terminal=jline.UnsupportedTerminal -Dsbt.log.noformat=true -Dfile.encoding=UTF-8 -Dsbt.version=1.6.2 -jar /tmp/metals8326955494356863230/sbt-launch.jar -Dbloop.export-jar-classifiers=sources bloopInstall'[0m
+2022.05.05 17:17:15 ERROR [info] waiting for lock on /home/lyc/.sbt/boot/sbt.boot.lock to be available...[0m
+2022.05.05 17:17:24 WARN  no build target for: /mnt/data/projects/npu/EasyNPU/project/metals.sbt[0m
+2022.05.05 17:18:21 ERROR You probably access the destination server through a proxy server that is not well configured.[0m
+2022.05.05 17:18:29 ERROR You probably access the destination server through a proxy server that is not well configured.[0m
+2022.05.05 17:19:51 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/io_2.12/1.6.0/io_2.12-1.6.0.jar ...[0m
+2022.05.05 17:19:51 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/sbt/1.6.2/sbt-1.6.2.jar ...[0m
+2022.05.05 17:19:51 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/logic_2.12/1.6.2/logic_2.12-1.6.2.jar ...[0m
+2022.05.05 17:19:51 ERROR downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.15/scala-library-2.12.15.jar ...[0m
+2022.05.05 17:19:51 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/run_2.12/1.6.2/run_2.12-1.6.2.jar ...[0m
+2022.05.05 17:19:51 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/main_2.12/1.6.2/main_2.12-1.6.2.jar ...[0m
+2022.05.05 17:19:51 ERROR :: loading settings :: url = jar:file:/tmp/metals691688990432324491/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:19:51 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/main-settings_2.12/1.6.2/main-settings_2.12-1.6.2.jar ...[0m
+2022.05.05 17:19:51 ERROR :: loading settings :: url = jar:file:/tmp/metals691688990432324491/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:19:51 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/actions_2.12/1.6.2/actions_2.12-1.6.2.jar ...[0m
+2022.05.05 17:19:51 ERROR :: loading settings :: url = jar:file:/tmp/metals691688990432324491/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:19:51 ERROR :: loading settings :: url = jar:file:/tmp/metals691688990432324491/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:19:51 ERROR :: loading settings :: url = jar:file:/tmp/metals691688990432324491/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:19:51 ERROR :: loading settings :: url = jar:file:/tmp/metals691688990432324491/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:19:51 ERROR :: loading settings :: url = jar:file:/tmp/metals691688990432324491/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:19:51 ERROR :: loading settings :: url = jar:file:/tmp/metals691688990432324491/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:19:53 ERROR 	[SUCCESSFUL ] org.scala-sbt#run_2.12;1.6.2!run_2.12.jar (1410ms)[0m
+2022.05.05 17:19:53 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/command_2.12/1.6.2/command_2.12-1.6.2.jar ...[0m
+2022.05.05 17:19:53 ERROR 	[SUCCESSFUL ] org.scala-sbt#logic_2.12;1.6.2!logic_2.12.jar (2334ms)[0m
+2022.05.05 17:19:53 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/collections_2.12/1.6.2/collections_2.12-1.6.2.jar ...[0m
+2022.05.05 17:19:57 ERROR 	[SUCCESSFUL ] org.scala-sbt#sbt;1.6.2!sbt.jar (5911ms)[0m
+2022.05.05 17:19:57 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/scripted-plugin_2.12/1.6.2/scripted-plugin_2.12-1.6.2.jar ...[0m
+2022.05.05 17:19:57 ERROR 	[SUCCESSFUL ] org.scala-sbt#scripted-plugin_2.12;1.6.2!scripted-plugin_2.12.jar (766ms)[0m
+2022.05.05 17:19:57 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc-lm-integration_2.12/1.6.2/zinc-lm-integration_2.12-1.6.2.jar ...[0m
+2022.05.05 17:20:03 ERROR 	[SUCCESSFUL ] org.scala-sbt#actions_2.12;1.6.2!actions_2.12.jar (11462ms)[0m
+2022.05.05 17:20:03 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/util-logging_2.12/1.6.2/util-logging_2.12-1.6.2.jar ...[0m
+2022.05.05 17:20:04 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc-lm-integration_2.12;1.6.2!zinc-lm-integration_2.12.jar (6437ms)[0m
+2022.05.05 17:20:04 ERROR downloading https://repo1.maven.org/maven2/io/get-coursier/lm-coursier-shaded_2.12/2.0.10/lm-coursier-shaded_2.12-2.0.10.jar ...[0m
+2022.05.05 17:20:20 ERROR 	[SUCCESSFUL ] org.scala-sbt#command_2.12;1.6.2!command_2.12.jar (27388ms)[0m
+2022.05.05 17:20:20 ERROR downloading https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.17.1/log4j-core-2.17.1.jar ...[0m
+2022.05.05 17:20:20 ERROR 	[SUCCESSFUL ] org.scala-sbt#collections_2.12;1.6.2!collections_2.12.jar (26820ms)[0m
+2022.05.05 17:20:20 ERROR downloading https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.17.1/log4j-slf4j-impl-2.17.1.jar ...[0m
+2022.05.05 17:20:22 ERROR 	[SUCCESSFUL ] org.apache.logging.log4j#log4j-slf4j-impl;2.17.1!log4j-slf4j-impl.jar (1861ms)[0m
+2022.05.05 17:20:22 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/librarymanagement-core_2.12/1.6.1/librarymanagement-core_2.12-1.6.1.jar ...[0m
+2022.05.05 17:20:29 ERROR 	[SUCCESSFUL ] org.scala-sbt#io_2.12;1.6.0!io_2.12.jar (37804ms)[0m
+2022.05.05 17:20:29 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/librarymanagement-ivy_2.12/1.6.1/librarymanagement-ivy_2.12-1.6.1.jar ...[0m
+2022.05.05 17:20:32 ERROR 	[SUCCESSFUL ] org.scala-sbt#main-settings_2.12;1.6.2!main-settings_2.12.jar (40745ms)[0m
+2022.05.05 17:20:32 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/compiler-interface/1.6.0/compiler-interface-1.6.0.jar ...[0m
+2022.05.05 17:20:43 ERROR 	[SUCCESSFUL ] org.scala-sbt#util-logging_2.12;1.6.2!util-logging_2.12.jar (40272ms)[0m
+2022.05.05 17:20:43 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc-compile_2.12/1.6.0/zinc-compile_2.12-1.6.0.jar ...[0m
+2022.05.05 17:20:43 ERROR 	[SUCCESSFUL ] org.scala-sbt#compiler-interface;1.6.0!compiler-interface.jar (11698ms)[0m
+2022.05.05 17:20:43 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/util-relation_2.12/1.6.2/util-relation_2.12-1.6.2.jar ...[0m
+2022.05.05 17:20:46 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc-compile_2.12;1.6.0!zinc-compile_2.12.jar (2941ms)[0m
+2022.05.05 17:20:46 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/util-position_2.12/1.6.2/util-position_2.12-1.6.2.jar ...[0m
+2022.05.05 17:20:46 ERROR 	[SUCCESSFUL ] org.scala-sbt#util-relation_2.12;1.6.2!util-relation_2.12.jar (2503ms)[0m
+2022.05.05 17:20:46 ERROR downloading https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.15/scala-reflect-2.12.15.jar ...[0m
+2022.05.05 17:20:50 ERROR 	[SUCCESSFUL ] org.scala-sbt#util-position_2.12;1.6.2!util-position_2.12.jar (4114ms)[0m
+2022.05.05 17:20:50 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/completion_2.12/1.6.2/completion_2.12-1.6.2.jar ...[0m
+2022.05.05 17:21:12 ERROR 	[SUCCESSFUL ] org.scala-sbt#completion_2.12;1.6.2!completion_2.12.jar (21976ms)[0m
+2022.05.05 17:21:12 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/task-system_2.12/1.6.2/task-system_2.12-1.6.2.jar ...[0m
+2022.05.05 17:21:28 ERROR 	[SUCCESSFUL ] org.scala-sbt#librarymanagement-ivy_2.12;1.6.1!librarymanagement-ivy_2.12.jar (58565ms)[0m
+2022.05.05 17:21:28 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/tasks_2.12/1.6.2/tasks_2.12-1.6.2.jar ...[0m
+2022.05.05 17:21:28 ERROR 	[SUCCESSFUL ] org.scala-sbt#task-system_2.12;1.6.2!task-system_2.12.jar (16353ms)[0m
+2022.05.05 17:21:28 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/testing_2.12/1.6.2/testing_2.12-1.6.2.jar ...[0m
+2022.05.05 17:21:31 ERROR 	[SUCCESSFUL ] org.scala-sbt#librarymanagement-core_2.12;1.6.1!librarymanagement-core_2.12.jar (68726ms)[0m
+2022.05.05 17:21:31 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/util-tracking_2.12/1.6.2/util-tracking_2.12-1.6.2.jar ...[0m
+2022.05.05 17:21:34 ERROR 	[SUCCESSFUL ] org.scala-sbt#util-tracking_2.12;1.6.2!util-tracking_2.12.jar (3348ms)[0m
+2022.05.05 17:21:34 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc-classpath_2.12/1.6.0/zinc-classpath_2.12-1.6.0.jar ...[0m
+2022.05.05 17:21:39 ERROR 	[SUCCESSFUL ] org.scala-sbt#tasks_2.12;1.6.2!tasks_2.12.jar (11253ms)[0m
+2022.05.05 17:21:39 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc-apiinfo_2.12/1.6.0/zinc-apiinfo_2.12-1.6.0.jar ...[0m
+2022.05.05 17:21:41 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc-classpath_2.12;1.6.0!zinc-classpath_2.12.jar (6871ms)[0m
+2022.05.05 17:21:41 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc_2.12/1.6.0/zinc_2.12-1.6.0.jar ...[0m
+2022.05.05 17:21:41 ERROR 	[SUCCESSFUL ] org.scala-sbt#testing_2.12;1.6.2!testing_2.12.jar (12972ms)[0m
+2022.05.05 17:21:41 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/util-control_2.12/1.6.2/util-control_2.12-1.6.2.jar ...[0m
+2022.05.05 17:21:44 ERROR 	[SUCCESSFUL ] org.scala-sbt#util-control_2.12;1.6.2!util-control_2.12.jar (2075ms)[0m
+2022.05.05 17:21:44 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/util-interface/1.6.2/util-interface-1.6.2.jar ...[0m
+2022.05.05 17:21:44 ERROR 	[SUCCESSFUL ] org.scala-sbt#util-interface;1.6.2!util-interface.jar (883ms)[0m
+2022.05.05 17:21:44 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/core-macros_2.12/1.6.2/core-macros_2.12-1.6.2.jar ...[0m
+2022.05.05 17:21:47 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc_2.12;1.6.0!zinc_2.12.jar (5901ms)[0m
+2022.05.05 17:21:47 ERROR downloading https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.15/scala-compiler-2.12.15.jar ...[0m
+2022.05.05 17:21:49 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc-apiinfo_2.12;1.6.0!zinc-apiinfo_2.12.jar (9697ms)[0m
+2022.05.05 17:21:49 ERROR downloading https://repo1.maven.org/maven2/com/swoval/file-tree-views/2.1.7/file-tree-views-2.1.7.jar ...[0m
+2022.05.05 17:21:49 ERROR 	[SUCCESSFUL ] org.scala-sbt#core-macros_2.12;1.6.2!core-macros_2.12.jar (4840ms)[0m
+2022.05.05 17:21:49 ERROR downloading https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.8.0/jna-5.8.0.jar ...[0m
+2022.05.05 17:22:14 ERROR 	[SUCCESSFUL ] com.swoval#file-tree-views;2.1.7!file-tree-views.jar (25342ms)[0m
+2022.05.05 17:22:14 ERROR downloading https://repo1.maven.org/maven2/net/java/dev/jna/jna-platform/5.8.0/jna-platform-5.8.0.jar ...[0m
+2022.05.05 17:22:31 ERROR 	[SUCCESSFUL ] org.apache.logging.log4j#log4j-core;2.17.1!log4j-core.jar (130727ms)[0m
+2022.05.05 17:22:31 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/util-cache_2.12/1.6.2/util-cache_2.12-1.6.2.jar ...[0m
+2022.05.05 17:22:45 ERROR 	[SUCCESSFUL ] org.scala-sbt#util-cache_2.12;1.6.2!util-cache_2.12.jar (14276ms)[0m
+2022.05.05 17:22:45 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/test-agent/1.6.2/test-agent-1.6.2.jar ...[0m
+2022.05.05 17:22:48 ERROR 	[SUCCESSFUL ] org.scala-sbt#test-agent;1.6.2!test-agent.jar (2495ms)[0m
+2022.05.05 17:22:48 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/compiler-bridge_2.12/1.6.0/compiler-bridge_2.12-1.6.0.jar ...[0m
+2022.05.05 17:23:08 ERROR 	[SUCCESSFUL ] org.scala-sbt#compiler-bridge_2.12;1.6.0!compiler-bridge_2.12.jar (19999ms)[0m
+2022.05.05 17:23:08 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc-classfile_2.12/1.6.0/zinc-classfile_2.12-1.6.0.jar ...[0m
+2022.05.05 17:23:17 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc-classfile_2.12;1.6.0!zinc-classfile_2.12.jar (9716ms)[0m
+2022.05.05 17:23:17 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc-core_2.12/1.6.0/zinc-core_2.12-1.6.0.jar ...[0m
+2022.05.05 17:23:21 ERROR 	[SUCCESSFUL ] org.scala-sbt#main_2.12;1.6.2!main_2.12.jar (209875ms)[0m
+2022.05.05 17:23:21 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc-persist_2.12/1.6.0/zinc-persist_2.12-1.6.0.jar ...[0m
+2022.05.05 17:23:36 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc-persist_2.12;1.6.0!zinc-persist_2.12.jar (14423ms)[0m
+2022.05.05 17:23:36 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc-compile-core_2.12/1.6.0/zinc-compile-core_2.12-1.6.0.jar ...[0m
+2022.05.05 17:23:42 ERROR 	[SUCCESSFUL ] net.java.dev.jna#jna-platform;5.8.0!jna-platform.jar (87575ms)[0m
+2022.05.05 17:23:42 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/zinc-persist-core-assembly/1.6.0/zinc-persist-core-assembly-1.6.0.jar ...[0m
+2022.05.05 17:23:48 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc-core_2.12;1.6.0!zinc-core_2.12.jar (30596ms)[0m
+2022.05.05 17:23:48 ERROR downloading https://repo1.maven.org/maven2/org/scala-sbt/protocol_2.12/1.6.2/protocol_2.12-1.6.2.jar ...[0m
+2022.05.05 17:23:51 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc-compile-core_2.12;1.6.0!zinc-compile-core_2.12.jar (14844ms)[0m
+2022.05.05 17:23:51 ERROR downloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.12/2.6.0/scala-collection-compat_2.12-2.6.0.jar ...[0m
+2022.05.05 17:23:56 ERROR 	[SUCCESSFUL ] net.java.dev.jna#jna;5.8.0!jna.jar (126664ms)[0m
+2022.05.05 17:24:08 ERROR 	[SUCCESSFUL ] org.scala-lang.modules#scala-collection-compat_2.12;2.6.0!scala-collection-compat_2.12.jar (17663ms)[0m
+2022.05.05 17:24:54 ERROR 	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.12.15!scala-reflect.jar (248070ms)[0m
+2022.05.05 17:25:08 ERROR 	[SUCCESSFUL ] org.scala-sbt#protocol_2.12;1.6.2!protocol_2.12.jar (80024ms)[0m
+2022.05.05 17:26:40 ERROR 	[SUCCESSFUL ] org.scala-sbt#zinc-persist-core-assembly;1.6.0!zinc-persist-core-assembly.jar (178027ms)[0m
+2022.05.05 17:26:41 ERROR 	[SUCCESSFUL ] org.scala-lang#scala-library;2.12.15!scala-library.jar (409704ms)[0m
+2022.05.05 17:35:34 ERROR 	[SUCCESSFUL ] org.scala-lang#scala-compiler;2.12.15!scala-compiler.jar (826470ms)[0m
+2022.05.05 17:35:57 ERROR 	[SUCCESSFUL ] io.get-coursier#lm-coursier-shaded_2.12;2.0.10!lm-coursier-shaded_2.12.jar (952477ms)[0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR :: problems summary ::[0m
+2022.05.05 17:35:57 ERROR :::: WARNINGS[0m
+2022.05.05 17:35:57 ERROR 	Host repo1.maven.org not found. url=https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.17.1/log4j-api-2.17.1.jar[0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR 	Host repo1.maven.org not found. url=https://repo.scala-sbt.org/scalasbt/maven-releases/org/apache/logging/log4j/log4j-api/2.17.1/log4j-api-2.17.1.jar[0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR 		::::::::::::::::::::::::::::::::::::::::::::::[0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR 		::              FAILED DOWNLOADS            ::[0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR 		:: ^ see resolution messages for details  ^ ::[0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR 		::::::::::::::::::::::::::::::::::::::::::::::[0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR 		:: org.apache.logging.log4j#log4j-api;2.17.1!log4j-api.jar[0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR 		::::::::::::::::::::::::::::::::::::::::::::::[0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR [0m
+2022.05.05 17:35:57 ERROR :: USE VERBOSE OR DEBUG MESSAGE LEVEL FOR MORE DETAILS[0m
+2022.05.05 17:35:57 ERROR [error] [launcher] download failed: org.apache.logging.log4j#log4j-api;2.17.1!log4j-api.jar[0m
+2022.05.05 17:35:57 ERROR [error] [launcher] error during sbt launcher: error retrieving required libraries[0m
+2022.05.05 17:35:57 ERROR   (see /home/lyc/.sbt/boot/update.log for complete log)[0m
+2022.05.05 17:35:57 ERROR [error] [launcher] could not retrieve sbt 1.6.2[0m
+2022.05.05 17:35:57 INFO  time: ran 'sbt bloopInstall' in 18m55s[0m
+2022.05.05 17:35:57 ERROR sbt command failed: /usr/local/jdk1.8/bin/java -Djline.terminal=jline.UnsupportedTerminal -Dsbt.log.noformat=true -Dfile.encoding=UTF-8 -Dsbt.version=1.6.2 -jar /tmp/metals691688990432324491/sbt-launch.jar -Dbloop.export-jar-classifiers=sources bloopInstall[0m
+2022.05.05 17:35:57 ERROR [info] [launcher] getting org.scala-sbt sbt 1.6.2  (this may take some time)...[0m
+2022.05.05 17:35:57 ERROR :: loading settings :: url = jar:file:/tmp/metals8326955494356863230/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:35:57 ERROR :: loading settings :: url = jar:file:/tmp/metals8326955494356863230/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:35:57 ERROR :: loading settings :: url = jar:file:/tmp/metals8326955494356863230/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:35:57 ERROR :: loading settings :: url = jar:file:/tmp/metals8326955494356863230/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:35:57 ERROR :: loading settings :: url = jar:file:/tmp/metals8326955494356863230/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:35:57 ERROR :: loading settings :: url = jar:file:/tmp/metals8326955494356863230/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:35:57 ERROR :: loading settings :: url = jar:file:/tmp/metals8326955494356863230/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:35:57 ERROR :: loading settings :: url = jar:file:/tmp/metals8326955494356863230/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml[0m
+2022.05.05 17:36:04 ERROR downloading https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.17.1/log4j-api-2.17.1.jar ...[0m
+2022.05.05 17:36:31 ERROR 	[SUCCESSFUL ] org.apache.logging.log4j#log4j-api;2.17.1!log4j-api.jar (33424ms)[0m
+2022.05.05 17:36:31 ERROR :: retrieving :: org.scala-sbt#boot-app[0m
+2022.05.05 17:36:31 ERROR 	confs: [default][0m
+2022.05.05 17:36:31 ERROR 	83 artifacts copied, 0 already retrieved[0m
+2022.05.05 17:36:31 ERROR [info] [launcher] getting Scala 2.12.15 (for sbt)...[0m
+2022.05.05 17:36:31 ERROR :: retrieving :: org.scala-sbt#boot-scala[0m
+2022.05.05 17:36:31 ERROR 	confs: [default][0m
+2022.05.05 17:36:31 ERROR 	5 artifacts copied, 0 already retrieved[0m
+2022.05.05 17:36:32 INFO  [info] Updated file /mnt/data/projects/npu/EasyNPU/project/build.properties: set sbt.version to 1.6.2[0m
+2022.05.05 17:36:32 INFO  [info] welcome to sbt 1.6.2 (Oracle Corporation Java 1.8.0_321)[0m
+2022.05.05 17:36:34 INFO  [info] loading settings for project easynpu-build-build from metals.sbt ...[0m
+2022.05.05 17:36:34 INFO  [info] loading project definition from /mnt/data/projects/npu/EasyNPU/project/project[0m
+2022.05.05 19:57:07 INFO  user cancelled sbt bloopInstall[0m
+2022.05.05 19:57:07 INFO  time: ran 'sbt bloopInstall' in 159m52s[0m
+2022.05.05 23:19:14 INFO  shutting down Metals[0m
+2022.05.05 23:20:30 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.05.05 23:20:30 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.05.05 23:20:30 INFO  Started: Metals version 0.11.5 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.05.05 23:20:31 INFO  time: initialize in 0.85s[0m

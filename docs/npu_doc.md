@@ -132,7 +132,56 @@ Weight的scratch pad与Ifmap类似，同样分成16组，只不过每组的条�
 
 ## SIMD PE控制器
 
+```C++
+for(i = 0; i < B; i += b)               // Batch tiling
+  for(oz = 0; oz < Wo; oz += z)         // Output Channel tiling
+    for(oy = 0; oy < Wy; oy += y)       // Output Row tiling
+      for(ox = 0; ox < Wx; ox += x){    // Output column tiling
+        for(kz = 0; kz < Ci; kz += k){  // Inner tiling
+          IBuf=IFMAP[i:i+b-1][kz:kz+k-1][oy:oy+y+Hk-1][ox:ox+x+Wk-1]
+          WBuf=KERNEL[oz:oz+z-1][kz:kz+k-1][:Hk-1][:Wk-1]
+          OUT[i:i+b-1][oz:oz+z-1][oy:oy+y-1][ox:ox+x-1] += IBuf conv WBuf
+        }
+      }
+```
 
++ EasyNPU为了简洁的原则，固定k和z为16。也就是说每次都固定从Ifmap中取出16个Input Channel的数据，并计算出16个Output Channel的结果。
++ 对于某些简单的推理任务，例如串行的音频流数据，Batch Size通常可以直接取1。因此上面的卷积循环可以忽略最外层的Batch循环。
+
+外层的四层循环我们将其交给Scheduler完成，PE控制器主要负责内层的循环，也就是计算下图所示的部分卷积：
+
+此处设定如下卷积参数：
+<center>
+
+| Name    | Abbrev | Describe    | 
+|:--|:--|:--|
+| stride_h  | sh | 卷积步长(H方向)|    
+| stride_w  | sw |卷积步长(W方向)|    
+| padding_h  | ph | 卷积填充(H方向)|   
+| padding_w  | pw | 卷积填充(W方向)|    
+| dilation_h | dh | 卷积膨胀因子(H方向)|  
+| dilation_w | dw |卷积膨胀因子(W方向)|    
+</center>
+
+首先可以根据输出图的大小[Wo,Ho]计算卷积Runtime时的输入图大小[Wi',Hi']:
+$$
+(Wi' + pw*2 - (Wk + dw*(Wk-1))) // sw = Wo \\
+(Hi' + ph*2 - (Hk + dh*(Hk-1))) // sh = Ho 
+$$
+对于一个部分卷积结果Ofmap[oz:oz+z-1][oy:oy+y-1][ox:ox+x-1], 可以计算其对应的输入Ifmap的相关参数为：
+
+$$
+(x' - (Wk + dw*(Wk-1))) // sw = x   \\
+$$
+可以得到：
+$$
+x' = sw * x +  (dw+1）*(Wk-1) + 1  \tag{1}
+$$
+同理：
+$$
+y' = sh * y +  (dh+1）*(Hk-1) + 1  \tag{2}
+$$
+公式1,2给出了分块卷积时的输入图大小。
 
 ## 存储
 
