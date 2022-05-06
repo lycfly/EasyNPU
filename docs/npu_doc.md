@@ -25,6 +25,8 @@ PE单元只负责实现基本的运算，有如下控制信号负责控制PE的�
 | Pe_ps_back_en  | 1  | Psum结果回环使能，控制Psum经定点化后是否送到到乘法器输入 |
 | Pe_ps_fix_typ  | ?  | Psum定点化类型选择，当Pe_ps_back_en有效时得到的乘加结果可选不同的定点化参数  |
 | Pe_maxpool_en  |  1 | Maxpool模式使能开关  |
+| Pe_byp_mul_en  |  1 | 乘法器旁路使能开关  |
+
 </center>
 
 ### 卷积算子
@@ -130,11 +132,12 @@ Weight的scratch pad与Ifmap类似，同样分成16组，只不过每组的条�
 + Bias 的数据可以复用weight的通路，利用PE中bias in与乘法器的数据打拍延迟
 **TBD**
 
-## SIMD PE控制器
+## PE控制器
+### PE控制流程模型
 
 ```C++
 for(i = 0; i < B; i += b)               // Batch tiling
-  for(oz = 0; oz < Wo; oz += z)         // Output Channel tiling
+  for(oz = 0; oz < Co; oz += z)         // Output Channel tiling
     for(oy = 0; oy < Wy; oy += y)       // Output Row tiling
       for(ox = 0; ox < Wx; ox += x){    // Output column tiling
         for(kz = 0; kz < Ci; kz += k){  // Inner tiling
@@ -182,6 +185,86 @@ $$
 y' = sh * y +  (dh+1）*(Hk-1) + 1  \tag{2}
 $$
 公式1,2给出了分块卷积时的输入图大小。
+输入图的导入交给Scheduler模块完成，因此PE控制器需要解决的问题是：
++ 给定一张输入图[x',y',k]，计算出输出图[x,y,z].
+
+EasyNPU的假定输入图通过If_Bus已经分批送入了Ifmap_scratch_pad中，且k固定为16。在ifmap分批送入时，相应的weight也分批被送入了weight_scratch_pad。
+以下图为例说明PE控制器控制PE进行一个普通卷积的过程。假设卷积的输入图大小为5\*5， 卷积核大小3\*3，步长为1, 输出通道z为4, 每个PE处理的输出通道数zs为2:
+
+<center>
+<img src="/docs/images/pe_ctrl.drawio.svg" width = "500" height = "900" alt="weight scratch pad"/>
+</center>
+
+1. **Pass 0**: Ifmap的第一个元素广播到PE中，与不同输出通道的卷积核的第一个元素在PE内进行计算，结果存在PE内部的Psum中。
+2. **Pass 1-8**: 各个PE的Weight输入保持不变，变更Ifmap输入，依次计算各输出图的部分卷积。Pass 8结束后PE内实际存储了9\*2个元素，对应两张输出图，但输出图中的每一个元素仅仅是单次卷积计算中的一次乘累加结果。
+3. **Pass 9**: 调度器在Pass 9之前需要导入第三和第四个输出通道的卷积核参数，然后Ifmap又回到第一个元素。另外，由于第一，二个输出通道的卷积核已经算完，可以预取下一批次的一，二通道卷积核进入Weight Pad。
+4. **Pass 10-17**，计算过程与Pass 1-8相同，只是计算的通道不同。计算完后就完成了所有输出图的卷积乘累加的第一次部分结果。
+5. **Pass n**: 后续的Pass实际就是在重复上面的0-17，区别在于Weight Pad中的数据在不断被替换，直到卷积核被完全覆盖。
+6. 当计算完一张ifmap后，对应普通卷积来说还需要计算其余输入通道，此时需要将Ifmap Pad切换到下一个通道的Ifmap，再重复上述过程。
+7. 对于具有逐通道计算特性的卷积，例如depthwise，pooling等操作，需要将ifmap Pad的输出方式改为多播，每个Pad连接一个PE。
+
+对上述过程稍加拆解，即可发现PE控制器需要实现的就是将Weight scratch pad中的一组weight（16个）失效前所要完成的功能。也就是上面Pass0-8的过程。在这个过程中，需要控制的信号有：
+<center>
+
+| Name  | Width  | Function  |
+|:--|:--|:--|
+| Pe_ps_addr  |  6  | Psum Regfile addr  |
+| if_hw_addr  |  6  | ifmap pad addr  |
+| if_ch_addr  |  4  | ifmap pad input channel addr  |
+| w_och_gcnt  |  4  | weight pad output channel group cnt  |
+
+</center>
+
+首先，计如下几个参数：
+<center>
+
+| Name  |  Function  |
+|:--|:--|
+| zs  |  每个pe计算的输出通道数  |
+| zp  |  z/zs, 参与运算的pe个数，通常为16，除非Co<16，或者分组的最后一组z<16  |
+
+</center>
+
+<center>
+<img src="/docs/images/pe_pass_ctrl.drawio.svg" width = "600" height = "400" alt="ifmap ctrl"/>
+</center>
+
+PE控制器完成普通卷积的流程用伪代码表示如下：
+```C++
+for(kzi = 0; kzi < k; kzi ++)           // Inner input channel tiling
+  for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
+    for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
+      
+      for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
+        for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
+          for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
+            // Every PE's behavior is same
+            PEs_ifmap_in=IF_PAD[kzi][sh*oyi][sw*oxi]
+            PEs_weight_in=W_PAD[ozi]
+            Psum_PADs[ozi][oyi][oxi] += PEs_ifmap_in * PEs_weight_in
+      }
+Psum_PADs[:z][:y][:x] transfer to DTCM
+```
+上面的循环中输出通道循环次数只有zs次，这是因为有zp(16)个PE，因此只需要循环一次就可以获得zp个输出，zs次循环就能算完z个输出通道。
+### GroupConv的支持
+实际上，普通卷积和Depthwise卷积应该都是GroupConv的一个特例。普通卷积对应group=Ci, 而Depthwise卷积对应group=1。因此NPU应该实现更一般的GroupConv，通过指定Group参数来实现其他类型的卷积。
+
+
+### Scratch Pad的预取
++ 对于逐通道的操作，上述流程代码仍然适用，只需要将最外层的k循环移除即可。
+
+对于Weight Pad的预取，上文已经提到，在每次利用完一组zp(16)个输出通道的weight后就可以导入下一批次的weight了。
+对于Ifmap Pad的预取，主要分两种情况：
+1. 多播模式： 此时对应逐通道模式，每个pad的数据会同时输出给PE。在kernel Row的最后一次循环中，每次算完k（16）个ifmap可以依次覆盖k个通道数据到Ifmap Pad中。
+2. 广播模式： 广播模式每次只有一个Pad连接到PE上，其他pad的数据则作为缓冲池保持静止，因此需要等到k循环的最后一次循环，也就是最有一个Pad接入PE计算时，算完一个Ifmap数据直接覆盖整个Ifmap对应位置的k（16）个数据。
+
+上述预取操作均只对PE控制器可见（只有PE控制器知道内层循环进展到哪里），因此由PE控制器发出预取请求给调度器。
+
+
+
+
+
+
 
 ## 存储
 
