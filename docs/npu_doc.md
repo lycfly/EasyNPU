@@ -259,7 +259,14 @@ Psum_PADs[:z][:y][:x] transfer to DTCM
 
 上述预取操作均只对PE控制器可见（只有PE控制器知道内层循环进展到哪里），因此由PE控制器发出预取请求给调度器。
 
+### 层融合
+通常来说，卷积层后面会紧跟一个BN层或者Activation层，有时还会伴随一个Pooling层。
+对于一个SubConv来说，输出图x\*y\*z求得后需要输出会DTCM，等待下一层计算时再被取出。而如果下一层是BN，激活或者池化层，实际上可以在算完一副SubConv后在PE内部完成上述层。例如Conv+BN，计算完Conv后Psum中的数据就已经是完整的，此时只需要控制Weight调度器将BN所需的mul和bias导入Weight Pad, 将Psum中的数据再输出回乘加器即可得到BN后的结果。Activation层也类似，如果是线性近似后的激活层，只需要导入A和B即可。
++ 为了避免层融合时导入的乘加参数与卷积/全连接参数混淆，对Weight Pad进行扩展，单独划分16\*3B的Reg存储BN的mul和Bias（mul-8bit, Bias-16bit)。
++ EasyNPU的层融合只考虑BN和Activation层，Pool层在PE内部的实现较为复杂，因此不予支持。而是导出到DTCM后当作一个新的等效卷积层进行计算。
++ 实现Activation层需要在PE内部维护一个线性插值的查找表，在这个融合的层开始之前需要从DTCM中读入。
 
+层融合的顺序可以是BN+ACT，也可以是ACT+BN,因此可以通过一个寄存器控制这两层的顺序，另一个2bit寄存器控制是否存在BN层和ACT层。
 
 
 ## Scheduler调度器
@@ -353,7 +360,7 @@ for(i = 0; i < B; i += b)               // Batch tiling
   for(oz = 0; oz < Co; oz += z)         // Output Channel tiling
     for(oy = 0; oy < Ho; oy += y)       // Output Row tiling
       for(ox = 0; ox < Wo; ox += x)     // Output column tiling
-        for(kz = 0; kz < Ci; kz += k){   // Input Channel tiling
+        for(kz = 0; kz < Ci; kz += k){  // Input Channel tiling
             kxi = PE_Ctrl_kxi
             hki = PE_Ctrl_hki
             wki = PE_Ctrl_wki
@@ -362,6 +369,40 @@ for(i = 0; i < B; i += b)               // Batch tiling
             ozi = PE_Ctrl_ozi  // iterator of zs tiling                     
             weight_bus =
              Weight_DTCM[kz+kzi][hki][wki][oz+ozi*zp:oz+(ozi+1)*zp-1] 
+        }   
+```
+## 总控制器
+```C++
+for(i = 0; i < B; i += b)               // Batch tiling
+  for(oz = 0; oz < Co; oz += z)         // Output Channel tiling
+    for(oy = 0; oy < Ho; oy += y)       // Output Row tiling
+      for(ox = 0; ox < Wo; ox += x)     // Output column tiling
+        for(kz = 0; kz < Ci; kz += k){  // Input Channel tiling
+          // Scheduler
+          for(iyi = 0; iyi < y'; iyi += 1)        // Input subconv Row tiling
+            for(ixi = 0; ixi < x'; ixi += 1){     // Input subconv Column tiling
+              iy = sh * oy + iyi
+              ix = sw * ox + ixi
+              Ifmap_bus = FMAP_DTCM[i][iy][ix][kz:kz+k-1]
+          // PE Ctrl
+          for(kzi = 0; kzi < k; kzi ++)           // Inner input channel tiling
+            for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
+              for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
+                
+                for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
+                  for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
+                    for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
+                      // Every PE's behavior is same
+                      weight_bus = Weight_DTCM[kz+kzi][hki][wki][oz+ozi*zp:oz+(ozi+1)*zp-1] 
+
+                      PEs_ifmap_in=IF_PAD[kzi][sh*oyi][sw*oxi]
+                      PEs_weight_in=W_PAD[ozi]
+                      Psum_PADs[ozi][oyi][oxi] += PEs_ifmap_in * PEs_weight_in
+                      if(kz == Ci){
+                        Ofmap_bus = Psum_PADs[ozi][oyi][oxi]
+                        FMAP_DTCM[i][oy+oyi][ox+oxi][oz+ozi*zp:oz+(ozi+1)*zp-1] = Ofmap_bus 
+                      }
+                }
         }   
 ```
 

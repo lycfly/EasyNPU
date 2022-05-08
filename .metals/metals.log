@@ -255,3 +255,11 @@ INFO: Unsupported notification method: $/setTrace
 2022.05.07 09:48:31 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
 2022.05.07 09:48:31 WARN  Build server is not auto-connectable.[0m
 2022.05.07 09:48:32 INFO  skipping build import with status 'Cancelled'[0m
+2022.05.08 00:36:01 INFO  shutting down Metals[0m
+2022.05.08 15:02:21 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.05.08 15:02:21 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.05.08 15:02:21 INFO  Started: Metals version 0.11.5 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.05.08 15:02:22 INFO  time: initialize in 0.9s[0m
+2022.05.08 15:02:23 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.05.08 15:02:23 WARN  Build server is not auto-connectable.[0m
+2022.05.08 15:02:23 INFO  skipping build import with status 'Cancelled'[0m
