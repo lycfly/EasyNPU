@@ -372,6 +372,81 @@ for(i = 0; i < B; i += b)               // Batch tiling
         }   
 ```
 ## 总控制器
+
+
+对于一次卷积映射，所需要确认的参数有：
+<center>
+
+| Name    | Abbrev |Width| Describe    | 
+|:--|:--|:--|:--|
+| y | - |6 |SubConv输出图高度|    
+| x | - |6 |SubConv输出图宽度|    
+| y' | - |6 |SubConv输入图高度|    
+| x' | - |6 |SubConv输入图宽度|    
+| Hk | - |8 |卷积核高度|    
+| Wk | - |8 |卷积核宽度|   
+| Ho | - |8 |输出图高度|    
+| Wo | - |8 |输出图宽度| 
+| Co | - |8 |输出通道数| 
+| Ci | - |8 |输入通道数| 
+| zs | - |6 |每个PE处理的输出通道数| 
+| stride_h  | sh | 4 | 卷积步长(H方向)|    
+| stride_w  | sw | 4 | 卷积步长(W方向)|    
+| padding_h  | ph |4 |  卷积填充(H方向)|   
+| padding_w  | pw |4 | 卷积填充(W方向)|    
+| dilation_h | dh |4 | 卷积膨胀因子(H方向)|  
+| dilation_w | dw |4 |卷积膨胀因子(W方向)| 
+</center>
+
+总共102bit数据。
+除此之外，还需要将每一层的operator进行编码，各个op在EasyNPU中主要有两种实现方式：
+<center>
+
+| Name   | Describe    | 
+|:--|:--|
+| BasicConv | 卷积类，可以实现全连接|    
+| ChannelWise | 逐层运算类，包括DepthWise, Pooling, BN, Tensor-Add, Tensor-Mul等|
+| FusedConv | 融合卷积层，可以实现卷积层和其他层的融合层|    
+
+</center>
+
+这两个操作的数据流基本是相同的，不同之处在于
+1. 卷积的输入通道需要累加，对应通道Router采取的是广播方式；而逐通道计算的输入通道是多播到各个PE的，不需要在通道方向进行累加。
+2. 逐通道计算不需要等所有输入通道数据都导入计算后才输出结果，而是每次遍历完一次卷积核大小就输出一次。
+
+这里列出支持的op:
+
+<center>
+
+|Opcode| Name     |Category| Describe    | 
+|:--|:--|:--|:--|
+|000_000_00 | 普通卷积 | BasicConv | 普通卷积 |  
+|000_000_00 | 全连接 | BasicConv | 全连接，等效为卷积（Hk=Wk=1)|    
+|000_000_01 | DepthWise卷积 | ChannelWise | 逐通道卷积|    
+|000_000_10 | Batchnorm | ChannelWise | BN层，等效逐通道卷积（Hk=Wk=1），需要bias接口|  
+|000_001_10 |Relu | ChannelWise | relu激活层，等效逐通道卷积（Hk=Wk=1） |  
+|000_010_10 |Activation | ChannelWise | 查表激活层，等效逐通道卷积（Hk=Wk=1），需要bias接口, |  
+|000_011_10 |MaxPooling | ChannelWise | Pooling,等效逐通道卷积, 无Weight参数 |  
+|000_100_10 |AvgPooling | ChannelWise | Pooling,等效逐通道卷积，有等效Weight参数|  
+|000_101_10 |Tensor-Add | ChannelWise | 两个张量相加，等效逐通道卷积（Hk=Wk=1），需要bias接口|  
+|000_110_10 |Tensor-Mul | ChannelWise | 两个张量相加，等效逐通道卷积（Hk=Wk=1），需要bias接口| 
+|00?_???_11 |卷积-BN-Act-Tensor Add | FusedConv | 融合层，包括一层卷积/全连接，一层BN，一层Act,一层Tensor操作。顺序可以自定义，但是需要附加数据流的支持|  
+
+
+</center>
+
+上表中比较特殊的是融合层——卷积-BN-Act。这样的层需要在卷积计算将要输出结果之前，额外再遍历一轮x,y,z循环，进行对应的乘加操作，之后再输出结果。
++ Opcode中的前两bit编码了基本的操作形式，00表示卷积，01表示Depthwise卷积，10表示等效的逐通道操作，11表示融合层。
++ 其中10编码的逐通道操作分为若干类，由bit2-4编码。
++ 融合层的Opcode中bit2-4表示BN, ACT, Tensor Add这三层的存在性，为1表示存在，0表示不存在。bit5表示BN与ACT层的顺序。
+
+EasyNPU的控制流的粒度是非常粗的，直接以一层为一条指令，相比于CPU和GPU而言这么做的好处是可以减少编译器的设计难度和复杂度，缺点是单条指令长度需要操作的寄存器非常多。指令长度也较长（~128bit)。
+EasyNPU的指令格式为：
+<center>
+<img src="/docs/images/wavedrom_opcode.png" alt="opcode"/>
+</center>
+
+整个EasyNPU的控制逻辑可以抽象为如下的伪代码：
 ```C++
 for(i = 0; i < B; i += b)               // Batch tiling
   for(oz = 0; oz < Co; oz += z)         // Output Channel tiling
@@ -383,28 +458,48 @@ for(i = 0; i < B; i += b)               // Batch tiling
             for(ixi = 0; ixi < x'; ixi += 1){     // Input subconv Column tiling
               iy = sh * oy + iyi
               ix = sw * ox + ixi
-              Ifmap_bus = FMAP_DTCM[i][iy][ix][kz:kz+k-1]
+              if(pw < ix < Wi' - pw && ph < iy < Hi' - ph)
+                Ifmap_bus = FMAP_DTCM[i][iy][ix][kz:kz+k-1]
+              else
+                Ifmap_bus = Padding_value(0)
           // PE Ctrl
           for(kzi = 0; kzi < k; kzi ++)           // Inner input channel tiling
             for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
               for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
                 
-                for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
-                  for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
-                    for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
-                      // Every PE's behavior is same
-                      weight_bus = Weight_DTCM[kz+kzi][hki][wki][oz+ozi*zp:oz+(ozi+1)*zp-1] 
+                for(fi=0; fi < fuse_n; fi ++)     // layer fusion loop
+                  for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
+                    for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
+                      for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
+                        // Every PE's behavior is same
+                        if(fi == 0){ // Conv/MLP
+                          weight_bus = Weight_DTCM[kz+kzi][hki][wki][oz+ozi*zp:oz+(ozi+1)*zp-1] 
 
-                      PEs_ifmap_in=IF_PAD[kzi][sh*oyi][sw*oxi]
-                      PEs_weight_in=W_PAD[ozi]
-                      Psum_PADs[ozi][oyi][oxi] += PEs_ifmap_in * PEs_weight_in
-                      if(kz == Ci){
-                        Ofmap_bus = Psum_PADs[ozi][oyi][oxi]
-                        FMAP_DTCM[i][oy+oyi][ox+oxi][oz+ozi*zp:oz+(ozi+1)*zp-1] = Ofmap_bus 
-                      }
+                          PEs_ifmap_in=IF_PAD[kzi][sh*oyi][sw*oxi]
+                          PEs_weight_in=W_PAD[ozi]
+                          Psum_PADs[ozi][oyi][oxi] += PEs_ifmap_in * PEs_weight_in
+                        }
+                        else{        // Fused BN or Act
+                          weight_bus = BN or ACT weights or None
+                          PEs_weight_in=W_PAD[ozi] or ACT_ROM or None
+                          PEs_ifmap_in=Psum[ozi][oyi][oxi]
+                          PEs_bias_in = Bias_PAD[ozi] or ACT_ROM or Another-DTCM
+                          Psum_PADs[ozi][oyi][oxi] = PEs_ifmap_in * PEs_weight_in + PEs_bias_in
+                        }
+
+                        if((kz == Ci-1 && BasicConv_mode) || (hki == Hk-1 && wki == Wk-1 && ChannelWise_mode)){
+                          if(fi == fuse_n-1){
+                            Ofmap_bus = Psum_PADs[ozi][oyi][oxi]
+                            FMAP_DTCM[i][oy+oyi][ox+oxi][oz+ozi*zp:oz+(ozi+1)*zp-1] = Ofmap_bus 
+                          }
+                        }
                 }
         }   
 ```
+
+特别地，为了适配融合层，在PE控制器内部需要增加一个融合层的Loop，其大小受融合层包含的层数决定。需要注意的是，当融合层包含Tensor操作时，需要从另一个DTCM中读取对应位置的数据放到PE的bias in接口，而读取DTCM数据的地址实际就是Ofmap Bus输出的地址，所以这种情况需要将bias接口接入DTCM读总线。
+
+总控制器负责从ITCM中取出指令，并对其进行解码后赋值Scheduler和PE控制器所需的寄存器。因此总控制器负责更宏观的控制（层级别）。
 
 ## 存储
 Ifmap_bus和Ofmap_bus理论上是有可能同时工作的, 如果追求高带宽，可以设置乒乓两个DTCM，一个负责读一个负责写，实现Ifmap和Ofmap能够同时读写。但是代价较高（两倍存储）。

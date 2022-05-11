@@ -1,0 +1,40 @@
+{
+  "reg": [
+    {"bits": 8,  "name": "opcode",    "attr": "OP",         "type": 1},
+    
+    {"bits": 4,  "name": "Sh",       "attr": "Stride H",    "type": 5},
+    {"bits": 4,  "name": "Sw",       "attr": "Stride W",    "type": 5},
+    {"bits": 4,  "name": "Ph",       "attr": "Padding H",   "type": 5},
+    {"bits": 4,  "name": "Pw",       "attr": "Padding W",   "type": 5},
+    {"bits": 4,  "name": "Dh",       "attr": "Dilation H",  "type": 5},
+    {"bits": 4,  "name": "Dw",       "attr": "Dilation W",  "type": 5},
+    
+    {"bits": 6,  "name": "y",        "attr": "Sub-Ofmap H", "type": 4},
+    {"bits": 6,  "name": "x",        "attr": "Sub-Ofmap W", "type": 4},
+    {"bits": 6,  "name": "y'",       "attr": "Sub-Ifmap H", "type": 4},
+    {"bits": 6,  "name": "x'",       "attr": "Sub-Ifmap W", "type": 4},
+    
+    {"bits": 8,  "name": "Hk",       "attr": "Kernel H",    "type": 3},
+    {"bits": 8,  "name": "Wk",       "attr": "Kernel W",    "type": 3},
+    {"bits": 8,  "name": "Ho",       "attr": "Ofmap H",     "type": 3},
+    {"bits": 8,  "name": "Wo",       "attr": "Ofmap W",     "type": 3},
+    
+    {"bits": 8,  "name": "Co",       "attr": "Out-Channal Num",    "type": 2},
+    {"bits": 8,  "name": "Ci",       "attr": "In-Channal Num",     "type": 2},
+    {"bits": 8,  "name": "Zs",       "attr": "Out-Channals in PE", "type": 2},
+    
+
+], 
+  "config": {
+    "hspace": 1000,
+    //"margin": {left: 100},
+    "fontsize": 14,
+    "bits": 128,
+    "lanes":4,
+    "hflip": false,
+    "vflip": false,
+    "compact": false,
+ //   "label": {left: 0},
+ //  "label": {right: ['I-Type','R-Type']},
+  }
+}
