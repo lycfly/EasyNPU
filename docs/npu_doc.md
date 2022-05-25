@@ -11,7 +11,7 @@
 + BN需要将参数合并成乘数和加数
 + 非线性激活函数可以通过线性插值，转换为ax+b的分段形式，内部提供一个分段查找表，将分段系数填入，根据x值获得对应的a和b，输入MAC进行计算
 <center>
-<img src="/docs/images/PE.drawio.svg" width = "500" height = "400" alt="PE结构"/>
+<img src="/docs/images/PE.drawio.svg" width = "600" height = "500" alt="PE结构"/>
 </center>
 
 PE单元只负责实现基本的运算，有如下控制信号负责控制PE的行为，进而组合成需要的计算功能:
@@ -23,7 +23,7 @@ PE单元只负责实现基本的运算，有如下控制信号负责控制PE的�
 | Pe_ps_addr  | 6  | Psum Regfile addr  |
 | Pe_ps_outer_en  | 1  | 外部Psum使能, 用于累加Bias |
 | Pe_ps_back_en  | 1  | Psum结果回环使能，控制Psum经定点化后是否送到到乘法器输入 |
-| Pe_ps_fix_typ  | ?  | Psum定点化类型选择，当Pe_ps_back_en有效时得到的乘加结果可选不同的定点化参数  |
+| Pe_ps_shift_scale  | 8  | Psum量化参数，通过编译器计算得到  |
 | Pe_maxpool_en  |  1 | Maxpool模式使能开关  |
 | Pe_byp_mul_en  |  1 | 乘法器旁路使能开关  |
 
@@ -31,17 +31,17 @@ PE单元只负责实现基本的运算，有如下控制信号负责控制PE的�
 
 ### 卷积算子
 + **Pe_ps_addr**信号选择Psum输出到对应的RegFile地址。
-+ **Pe_ps_outer_en**,**Pe_ps_back_en**,**Pe_ps_fix_typ**均保持默认值（0）。
++ **Pe_ps_outer_en**,**Pe_ps_back_en**,均保持默认值（0）。
 
 ### 全连接算子
 + **Pe_ps_addr**信号选择Psum输出到对应的RegFile地址。
-+ **Pe_ps_outer_en**,**Pe_ps_back_en**,**Pe_ps_fix_typ**均保持默认值（0）。
++ **Pe_ps_outer_en**,**Pe_ps_back_en**均保持默认值（0）。
   
 ### BN算子
   BN算子用于计算BatchNormal操作。BN一般都位于卷积算子之后，因此可以直接对PE内部卷积计算完成的Psum进行BN操作，过程如下：
 1. **Pe_ps_addr**信号选择Psum对应的RegFile地址。
 2. 配置**Pe_ps_outer_en** = 1, 选择加法器一端输入为pe_bias_in。
-3. 配置**Pe_ps_fix_typ**，选择BN输入数据的量化参数。
+3. 配置**Pe_ps_shift_scale**，选择BN输入数据的量化参数。
 4. 配置**Pe_ps_back_en**=1, 选择乘法器一端输入为定点量化之后的Psum。
 5. pe_weight_in端口输入数据为BN对应的乘数。
 
@@ -56,9 +56,10 @@ PE单元只负责实现基本的运算，有如下控制信号负责控制PE的�
 在PE内部只需要将Psum中的内容跟输入的Ifmap进行累加即可获得跳远连接累加后的输出。也就是将卷积层与Add层进行了融合。此时控制信号：
 
 1. **Pe_ps_addr**信号选择Psum对应的RegFile地址。
-2. **Pe_ps_outer_en，Pe_ps_fix_typ** 保持默认值0。
-3. 配置**Pe_ps_back_en**=1, 选择乘法器一端输入为定点量化之后的Psum。
-4. pe_weight_in端口输入数据为short cut的乘数系数（如果需要的话）。
+2. **Pe_ps_outer_en** 保持默认值0。
+3. **Pe_ps_shift_scale**输入量化参数。
+4. 配置**Pe_ps_back_en**=1, 选择乘法器一端输入为定点量化之后的Psum。
+5. pe_weight_in端口输入数据为short cut的乘数系数（如果需要的话）。
 
 这种本地计算short cut的add操作可以减少ifmap的重复读入，但是限制是short cut只能跳一个层，限制还是比较大的。如果跳跃了多个层，还是需要将Psum存回外部存储，之后再当作ifmap导入到需要进行Add操作的层。因此对于这种更一般的情况，控制信号为:
 1. **Pe_ps_addr**信号选择Psum对应的RegFile地址。
@@ -250,8 +251,7 @@ Psum_PADs[:z][:y][:x] transfer to DTCM
 
 
 ### Scratch Pad的预取
-+ 对于逐通道的操作，上述流程代码仍然适用，只需要将最外层的k循环移除即可。
-
+对于逐通道的操作，上述流程代码仍然适用，只需要将最外层的k循环移除即可。
 对于Weight Pad的预取，上文已经提到，在每次利用完一组zp(16)个输出通道的weight后就可以导入下一批次的weight了。
 对于Ifmap Pad的预取，主要分两种情况：
 1. 多播模式： 此时对应逐通道模式，每个pad的数据会同时输出给PE。在kernel Row的最后一次循环中，每次算完k（16）个ifmap可以依次覆盖k个通道数据到Ifmap Pad中。
@@ -260,13 +260,22 @@ Psum_PADs[:z][:y][:x] transfer to DTCM
 上述预取操作均只对PE控制器可见（只有PE控制器知道内层循环进展到哪里），因此由PE控制器发出预取请求给调度器。
 
 ### 层融合
+#### 硬件层融合
 通常来说，卷积层后面会紧跟一个BN层或者Activation层，有时还会伴随一个Pooling层。
-对于一个SubConv来说，输出图x\*y\*z求得后需要输出会DTCM，等待下一层计算时再被取出。而如果下一层是BN，激活或者池化层，实际上可以在算完一副SubConv后在PE内部完成上述层。例如Conv+BN，计算完Conv后Psum中的数据就已经是完整的，此时只需要控制Weight调度器将BN所需的mul和bias导入Weight Pad, 将Psum中的数据再输出回乘加器即可得到BN后的结果。Activation层也类似，如果是线性近似后的激活层，只需要导入A和B即可。
-+ 为了避免层融合时导入的乘加参数与卷积/全连接参数混淆，对Weight Pad进行扩展，单独划分16\*3B的Reg存储BN的mul和Bias（mul-8bit, Bias-16bit)。
-+ EasyNPU的层融合只考虑BN和Activation层，Pool层在PE内部的实现较为复杂，因此不予支持。而是导出到DTCM后当作一个新的等效卷积层进行计算。
-+ 实现Activation层需要在PE内部维护一个线性插值的查找表，在这个融合的层开始之前需要从DTCM中读入。
+对于一个SubConv来说，输出图x\*y\*z求得后需要输出会DTCM，等待下一层计算时再被取出。而如果下一层是BN，激活或者池化层，实际上可以在算完一副SubConv后在PE内部完成上述层。
 
 层融合的顺序可以是BN+ACT，也可以是ACT+BN,因此可以通过一个寄存器控制这两层的顺序，另一个2bit寄存器控制是否存在BN层和ACT层。
+#### 软件层融合
+实际上目前NN训练和推理引擎对层融合的支持已经不错了。例如在Pytorch中的ConvBNRelu层，可以直接把这三层合并为一层，相应的权重和bias也会做合并，硬件看到的实际上就是一个类卷积层。
+在Pytorch导出模型到ONNX时，也会做上述图优化。最常见的就是把卷积后的BN层融入卷积中，这样只要网络中的BN之前都是卷积或全连接，导出ONNX后图中就不存在BN层，可以极大简化硬件实现难度。当然，需要在设计网络时就注意这些Tricks。
+#### 融合层硬件实现
+由于BN层可以通过软件优化到卷积中，因此硬件不做特殊处理，在实际硬件计算时可以进行融合层包括：激活层,池化层，reshape层，Elementwise操作层。
++ Pool层在PE内部的实现较为复杂，因此不予支持。而是导出到DTCM后当作一个新的等效卷积层进行计算。
++ 实现Activation层需要在PE内部维护一个线性插值的查找表，在这个融合的层开始之前需要从DTCM中读入。
++ Reshape算子本身不包含任何计算逻辑，而是将输入图按照一定顺序进行重组，因此可以在某一层计算完后，导出ofmap时进行。
++ Elementwise层需要接受两个等大小的Ifmap，进行逐元素计算。如果是逐元素乘，需要将psum通过feedback送回乘法器，另一张图从bias输入口进入乘法器另一端进行计算。如果是进行加法，则还需要对乘法器进行bypass。
+
+
 
 
 ## Scheduler调度器
@@ -352,6 +361,24 @@ for(i = 0; i < B; i += b)               // Batch tiling
 ```
 Ifmap_bus和Ofmap_bus理论上是有可能同时工作的，为了复用同一块存储，EasyNPU将Ifmap和Ofmap Bus实现为同一条总线，内部进行简单的仲裁（总是让Ofmap的写请求胜出），从而简化硬件设计。
 
+#### Reshape算子
+Reshape算子不包含计算逻辑，但是会对数据的排列进行修改。对排列的修改需要在数据存放时对地址进行重新计算。由于重新计算后的地址很有可能与还未使用过的Ifmap数据冲突，因此在Reshape算子与其他层融合时，输出ofmap到DTCM中会经过一个地址转换，而这个转换需要保证不会覆盖掉还未使用的数据。
+一种简单的办法是乒乓存储，即开辟两块存储区，一块负责输入，一块负责接受输出，之后不断调换两者的角色。但是这样的作法需要开辟的存储就是最大中间存储量的两倍。
+一种折中方式是使用一块存储，为了让输入输出完全错开，输入从地址0开始向下写入，而输出数据则从最大地址开始向上写入。这样只要保证存储器每次都能容纳两层的中间结果即可。
+这种方式换来的好处是:
+1. 当存在reshape操作时，可以支持reshape与其他层的融合。
+2. 当存在reshape操作时，减少了使用乒乓逻辑带来的额外SRAM外围电路开销。
+3. 当不存在reshape操作时，中间结果存储的容量更大。
+
+相应的代价是需要一定的地址解码逻辑。
+
+对reshape操作进一步分析可知，一般reshape操作都是将某些维度进行对换，或者是将某一维度切分后拼接到另一个维度。对于维度对换，如果输入是4维Tensor，则最多有$A_4^4=24$种情况，只需要一个查找表将4维的迭代参数重排即可。
+对于切分的情况,需要为每个维度分配一个切分参数和一个叠加参数。被切分的维度会被“摞到”被叠加的维度上。这个过程有点像摞麻将牌。例如有一堆麻将牌，长宽高分别为[6,4,2]。现在我们想要将其在长方向切分一半，在高度方向扩展一倍，也就是reshape为[3,4,6]。这一个过程其实就是把麻将牌在长度方向分成两份，在将第二份摞到第一份上。
+上面的是将高维度的切分给低维度，直接切分即可。但是当低维度切分给高维度时，则不是简单的拼接。例如长宽高[2,4,6]，需要reshape为[4,4,3]，也就是将高方向切一半分给长度。此时的过程是先将其拦腰切一半得到两份，之后将上面那一份"插入"下面那一份中，而不是直接拿下来放在下面那堆牌旁边。
+
+**特殊情况：**
+当reshape之前的map需要进行skip处理，也就是需要先暂存一下时，我们便不能简单地将ofmap的地址修改为reshape之后的了。而是需要保留两份地址，一份是按照原来的顺序存放的地址，一份是reshape之后转义的地址。
+
 ### Weight 调度器
 PE控制器完整地负责x\*y\*z大小的输出图计算，但是在计算过程中，weight和ifmap scratch pad都需要预取数据保证PE阵列能够满负荷运作。预取的时机在pe控制器中已经进行了说明。
 对于Weight数据的调度，实际上PE控制器已经负责了大部分工作。PE控制器的内部循环可以覆盖k,Wk,Hk,z循环，需要Weight调度器负责的就是将z和k转换到Weight DTCM中，需要加上通道方向的历史数据(oz,kz）来索引DTCM中的Fmap和Weight，对应的控制伪代码如下：
@@ -406,7 +433,7 @@ for(i = 0; i < B; i += b)               // Batch tiling
 |:--|:--|
 | BasicConv | 卷积类，可以实现全连接|    
 | ChannelWise | 逐层运算类，包括DepthWise, Pooling, BN, Tensor-Add, Tensor-Mul等|
-| FusedConv | 融合卷积层，可以实现卷积层和其他层的融合层|    
+| FusedLayer | 融合层，可以实现其他层和激活层的融合层|    
 
 </center>
 
@@ -422,6 +449,7 @@ for(i = 0; i < B; i += b)               // Batch tiling
 |:--|:--|:--|:--|
 |000_000_00 | 普通卷积 | BasicConv | 普通卷积 |  
 |000_000_00 | 全连接 | BasicConv | 全连接，等效为卷积（Hk=Wk=1)|    
+|000_001_00 | 带relu的卷积 | BasicConv | 带relu的卷积 |    
 |000_000_01 | DepthWise卷积 | ChannelWise | 逐通道卷积|    
 |000_000_10 | Batchnorm | ChannelWise | BN层，等效逐通道卷积（Hk=Wk=1），需要bias接口|  
 |000_001_10 |Relu | ChannelWise | relu激活层，等效逐通道卷积（Hk=Wk=1） |  
@@ -430,15 +458,16 @@ for(i = 0; i < B; i += b)               // Batch tiling
 |000_100_10 |AvgPooling | ChannelWise | Pooling,等效逐通道卷积，有等效Weight参数|  
 |000_101_10 |Tensor-Add | ChannelWise | 两个张量相加，等效逐通道卷积（Hk=Wk=1），需要bias接口|  
 |000_110_10 |Tensor-Mul | ChannelWise | 两个张量相加，等效逐通道卷积（Hk=Wk=1），需要bias接口| 
-|00?_???_11 |卷积-BN-Act-Tensor Add | FusedConv | 融合层，包括一层卷积/全连接，一层BN，一层Act,一层Tensor操作。顺序可以自定义，但是需要附加数据流的支持|  
+|100_000_00 |Reshape    | Reshape     | Reshape操作 | 
+|001\_???\_?? |Fused layer| Fused  | 指示该层与下一层进行融合 |  
+|01?\_???\_?? |stored layer| Fused  | 指示该层需要缓存起来（跳远连接） |  
 
 
 </center>
 
-上表中比较特殊的是融合层——卷积-BN-Act。这样的层需要在卷积计算将要输出结果之前，额外再遍历一轮x,y,z循环，进行对应的乘加操作，之后再输出结果。
-+ Opcode中的前两bit编码了基本的操作形式，00表示卷积，01表示Depthwise卷积，10表示等效的逐通道操作，11表示融合层。
+上表中比较特殊的是融合层和跳远连接层。对于融合bit位为高的层，需要将下一层的指令也读取出来。这样的层需要在卷积计算将要输出结果之前，额外再遍历一轮x,y,z循环，进行对应的激活/Element/Reshape操作，之后再输出结果。
++ Opcode中的前两bit编码了基本的操作形式，00表示卷积，01表示Depthwise卷积，10表示等效的逐通道操作。
 + 其中10编码的逐通道操作分为若干类，由bit2-4编码。
-+ 融合层的Opcode中bit2-4表示BN, ACT, Tensor Add这三层的存在性，为1表示存在，0表示不存在。bit5表示BN与ACT层的顺序。
 
 EasyNPU的控制流的粒度是非常粗的，直接以一层为一条指令，相比于CPU和GPU而言这么做的好处是可以减少编译器的设计难度和复杂度，缺点是单条指令长度需要操作的寄存器非常多。指令长度也较长（~128bit)。
 EasyNPU的指令格式为：

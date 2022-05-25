@@ -1,0 +1,4 @@
+[debug] [easynpu] Classpath dependencies List()
+[debug] [easynpu] Dependencies from configurations List()
+[debug] Bloop wrote the configuration of project 'easynpu' to '/mnt/data/projects/npu/EasyNPU/.bloop/easynpu.json'
+[success] Generated .bloop/easynpu.json
