@@ -153,6 +153,9 @@ for(i = 0; i < B; i += b)               // Batch tiling
 + 对于某些简单的推理任务，例如串行的音频流数据，Batch Size通常可以直接取1。因此上面的卷积循环可以忽略最外层的Batch循环。
 
 外层的四层循环我们将其交给Scheduler完成，PE控制器主要负责内层的循环，也就是计算下图所示的部分卷积：
+<center>
+<img src="/docs/images/pe_pass_ctrl.drawio.svg" width = "600" height = "400" alt="ifmap ctrl"/>
+</center>
 
 此处设定如下卷积参数：
 <center>
@@ -224,9 +227,6 @@ EasyNPU的假定输入图通过If_Bus已经分批送入了Ifmap_scratch_pad中�
 
 </center>
 
-<center>
-<img src="/docs/images/pe_pass_ctrl.drawio.svg" width = "600" height = "400" alt="ifmap ctrl"/>
-</center>
 
 PE控制器完成普通卷积的流程用伪代码表示如下：
 ```C++
