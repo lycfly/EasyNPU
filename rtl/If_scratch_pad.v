@@ -1,11 +1,10 @@
 // Generator : SpinalHDL v1.7.0    git head : eca519e78d4e6022e34911ec300a432ed9db8220
 // Component : If_scratch_pad
-// Git hash  : 3ad115d02ede82ce5afb11275af1efb2655ff862
+// Git hash  : f1f795b65a2a20dfc7920bbbc2342e1f6ac30d62
 
 `timescale 1ns/1ps
 
 module If_scratch_pad (
-  input               test,
   input               ifscp_wbus_wr,
   input      [5:0]    ifscp_wbus_waddr,
   input      [127:0]  ifscp_wbus_wdata,

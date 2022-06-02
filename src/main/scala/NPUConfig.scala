@@ -28,15 +28,13 @@ case class NPUConfig(
                 MAX_KERNEL_H :  Int = 256,
                 MAX_KERNEL_W :  Int = 256,
 
-                MAX_SUB_HEIGHT: Int = 64,
-                MAX_SUB_WIDTH: Int = 64,
-                MAX_SUB_OCH: Int = 64,
                 MAX_STRIDE: Int = 16,
                 MAX_PADDING: Int = 16,
                 MAX_DILATION: Int = 16,
                 SizePOWin: Array[Int] = Array(1,20,15)
 
 ){
+    val PE_PSUM_ADDRWD: Int = log2Up(PE_PSUM_NUM)
     val PE_SCALE_WD:  Int = log2Up(PE_BIAS_WD)
     val IFSCP_ADDRWD: Int = log2Up(IFSCP_SIZE)
     val WESCP_ADDRWD: Int = log2Up(WESCP_SIZE)
@@ -48,9 +46,14 @@ case class NPUConfig(
     val KERNEL_W_WD : Int = log2Up(MAX_KERNEL_W)
     val CHANNEL_WD:   Int = log2Up(MAX_CHANNEL)
 
+    val MAX_SUB_HEIGHT: Int = IFSCP_SIZE
+    val MAX_SUB_WIDTH:  Int = IFSCP_SIZE
+    val MAX_SUB_OCH:    Int = WESCP_SIZE
+    val MAX_SUB_ICH:    Int = ARRAY_COL_NUM
     val SUBH_WD:      Int = log2Up(MAX_SUB_HEIGHT)  
     val SUBW_WD:      Int = log2Up(MAX_SUB_WIDTH)  
     val SUBOCH_WD:    Int = log2Up(MAX_SUB_OCH)  
+    val SUBICH_WD:    Int = log2Up(MAX_SUB_ICH)
     val STRIDE_WD:    Int = log2Up(MAX_STRIDE)  
     val PADDING_WD:   Int = log2Up(MAX_PADDING)  
     val DILATION_WD:  Int = log2Up(MAX_DILATION) 

@@ -11,7 +11,7 @@
 + BN需要将参数合并成乘数和加数
 + 非线性激活函数可以通过线性插值，转换为ax+b的分段形式，内部提供一个分段查找表，将分段系数填入，根据x值获得对应的a和b，输入MAC进行计算
 <center>
-<img src="/docs/images/PE.drawio.svg" width = "600" height = "500" alt="PE结构"/>
+<img src="/docs/images/PE.drawio.svg" width = "700" height = "300" alt="PE结构"/>
 </center>
 
 PE单元只负责实现基本的运算，有如下控制信号负责控制PE的行为，进而组合成需要的计算功能:
@@ -21,13 +21,20 @@ PE单元只负责实现基本的运算，有如下控制信号负责控制PE的�
 | Name  | Width  | Function  |
 |:--|:--|:--|
 | Pe_ps_addr  | 6  | Psum Regfile addr  |
-| Pe_ps_outer_en  | 1  | 外部Psum使能, 用于累加Bias |
+| Pe_ps_pinA_outer_en  | 1  | 外部Psum使能, 用于累加Bias, 作用于加法器的A端 |
+| Pe_ps_pinB_outer_en  | 1  | 外部Psum使能, 用于累加Bias, 作用于加法器的B端 |
 | Pe_ps_back_en  | 1  | Psum结果回环使能，控制Psum经定点化后是否送到到乘法器输入 |
-| Pe_ps_shift_scale  | 8  | Psum量化参数，通过编译器计算得到  |
+| Pe_scale_qnt_en     | 1  | Psum量化使能  |
 | Pe_maxpool_en  |  1 | Maxpool模式使能开关  |
 | Pe_byp_mul_en  |  1 | 乘法器旁路使能开关  |
+| Ps_rd  |  1 | psum regfile 读使能  |
+| Ps_allow_rd  |  1 | psum regfile 可读使能  |
+| Ps_wr  |  1 | psum regfile 写使能  |
 
 </center>
+
+- [x] 添加可读使能，每个psum的第一次结果不需要读取psum regfile，需要屏蔽读使能并将读输出结果置为0.
+- [ ] scale, bias输入到PE中的查找表存储器中，支持线性近似激活函数。需要将psum输出接入查找表，bias查找表输出接到加法器，scala查找表输出接到乘法器，一次乘累加得到激活值。
 
 ### 卷积算子
 + **Pe_ps_addr**信号选择Psum输出到对应的RegFile地址。
@@ -57,7 +64,7 @@ PE单元只负责实现基本的运算，有如下控制信号负责控制PE的�
 
 1. **Pe_ps_addr**信号选择Psum对应的RegFile地址。
 2. **Pe_ps_outer_en** 保持默认值0。
-3. **Pe_ps_shift_scale**输入量化参数。
+3. **Pe_shift_scale**输入量化参数。
 4. 配置**Pe_ps_back_en**=1, 选择乘法器一端输入为定点量化之后的Psum。
 5. pe_weight_in端口输入数据为short cut的乘数系数（如果需要的话）。
 
@@ -230,10 +237,10 @@ EasyNPU的假定输入图通过If_Bus已经分批送入了Ifmap_scratch_pad中�
 
 PE控制器完成普通卷积的流程用伪代码表示如下：
 ```C++
-for(kzi = 0; kzi < k; kzi ++)           // Inner input channel tiling
-  for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
-    for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
-      
+for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
+  for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
+    for(kzi = 0; kzi < k; kzi ++)     // Inner input channel tiling
+
       for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
         for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
           for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
@@ -241,10 +248,11 @@ for(kzi = 0; kzi < k; kzi ++)           // Inner input channel tiling
             PEs_ifmap_in=IF_PAD[kzi][sh*oyi][sw*oxi]
             PEs_weight_in=W_PAD[ozi]
             Psum_PADs[ozi][oyi][oxi] += PEs_ifmap_in * PEs_weight_in
-      }
+    }
 Psum_PADs[:z][:y][:x] transfer to DTCM
 ```
 上面的循环中输出通道循环次数只有zs次，这是因为有zp(16)个PE，因此只需要循环一次就可以获得zp个输出，zs次循环就能算完z个输出通道。
+另外，K循环紧接着zs的循环，保证weight buffer中的数据复用。（当depthwise卷积时没有这部分复用，k循环相当于被展开了）
 ### GroupConv的支持（TBD）
 实际上，普通卷积和Depthwise卷积应该都是GroupConv的一个特例。普通卷积对应group=Ci, 而Depthwise卷积对应group=1。因此NPU应该实现更一般的GroupConv，通过指定Group参数来实现其他类型的卷积。
 对Group的支持只需要将PE控制器伪代码最外层的k循环的上限换成gc即可。
@@ -492,10 +500,10 @@ for(i = 0; i < B; i += b)               // Batch tiling
               else
                 Ifmap_bus = Padding_value(0)
           // PE Ctrl
-          for(kzi = 0; kzi < k; kzi ++)           // Inner input channel tiling
-            for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
-              for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
-                
+          for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
+            for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
+              for(kzi = 0; kzi < k; kzi ++)     // Inner input channel tiling
+
                 for(fi=0; fi < fuse_n; fi ++)     // layer fusion loop
                   for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
                     for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling

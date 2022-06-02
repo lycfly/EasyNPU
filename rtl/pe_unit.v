@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.7.0    git head : eca519e78d4e6022e34911ec300a432ed9db8220
 // Component : pe_unit
-// Git hash  : 3ad115d02ede82ce5afb11275af1efb2655ff862
+// Git hash  : f1f795b65a2a20dfc7920bbbc2342e1f6ac30d62
 
 `timescale 1ns/1ps
 
@@ -11,17 +11,22 @@ module pe_unit (
   input      [7:0]    pe_ifmap_in_payload,
   input               pe_bias_in_valid,
   input      [31:0]   pe_bias_in_payload,
+  input               pe_shift_scale_valid,
+  input      [4:0]    pe_shift_scale_payload,
   output              pe_ofmap_out_valid,
   output     [7:0]    pe_ofmap_out_payload,
   input               pe_ctrl_ps_back_en,
-  input      [6:0]    pe_ctrl_ps_addr,
+  input      [6:0]    pe_ctrl_ps_waddr,
+  input      [6:0]    pe_ctrl_ps_raddr,
   input               pe_ctrl_ps_wr,
   input               pe_ctrl_ps_rd,
-  input               pe_ctrl_ps_outer_en,
+  input               pe_ctrl_ps_allow_rd,
+  input               pe_ctrl_ps_pinA_bias_en,
+  input               pe_ctrl_ps_pinB_bias_en,
   input               pe_ctrl_byp_mul_en,
   input               pe_ctrl_maxpool_en,
   input               pe_ctrl_bias_mul_en,
-  input      [4:0]    pe_ctrl_shift_scale,
+  input               pe_ctrl_ps_scale_en,
   output              pe_flags_ps_rd_ready,
   output              pe_flags_ps_wr_ready,
   input               clk,
@@ -33,8 +38,10 @@ module pe_unit (
   wire                Multiplier_finish;
   wire                Multiplier_dout_vld;
   wire       [31:0]   Adder_result;
+  wire       [31:0]   qnt_quant_data;
   wire       [31:0]   Ps_rgfile_rdata;
-  wire       [7:0]    qnt_quant_data;
+  wire       [31:0]   tmp_ps_rf_rdata_payload;
+  wire       [31:0]   tmp_ps_rf_rdata_payload_1;
   reg        [7:0]    Mula;
   reg        [7:0]    Mulb;
   wire                MA_AfterMux_valid;
@@ -50,40 +57,46 @@ module pe_unit (
   wire                adder_out_valid;
   wire       [31:0]   adder_out_payload;
   wire       [31:0]   mul_out_ext;
-  wire       [31:0]   bias_Adder;
+  wire       [31:0]   adder_pinB;
+  wire       [31:0]   adder_pinA;
   wire                ps_rf_rdata_valid;
   wire       [31:0]   ps_rf_rdata_payload;
-  reg                 pe_ctrl_ps_rd_regNext;
+  wire                ps_true_rd_en;
+  reg                 ps_true_rd_en_regNext;
 
+  assign tmp_ps_rf_rdata_payload = Ps_rgfile_rdata;
+  assign tmp_ps_rf_rdata_payload_1 = 32'h0;
   multiplier_wrap Multiplier (
-    .dinA     (Mula[7:0]            ), //i
-    .dinB     (Mulb[7:0]            ), //i
-    .din_vld  (pe_flags_ps_rd_ready ), //i
-    .dout     (Multiplier_dout[15:0]), //o
-    .finish   (Multiplier_finish    ), //o
-    .dout_vld (Multiplier_dout_vld  ), //o
-    .clk      (clk                  ), //i
-    .resetn   (resetn               )  //i
+    .dinA     (Mula[7:0]                ), //i
+    .dinB     (Mulb[7:0]                ), //i
+    .din_vld  (MA_AfterMux_valid_regNext), //i
+    .dout     (Multiplier_dout[15:0]    ), //o
+    .finish   (Multiplier_finish        ), //o
+    .dout_vld (Multiplier_dout_vld      ), //o
+    .clk      (clk                      ), //i
+    .resetn   (resetn                   )  //i
   );
   adder_unit Adder (
-    .pinA       (mul_out_ext[31:0] ), //i
-    .pinB       (bias_Adder[31:0]  ), //i
+    .pinA       (adder_pinA[31:0]  ), //i
+    .pinB       (adder_pinB[31:0]  ), //i
     .maxpool_en (pe_ctrl_maxpool_en), //i
     .result     (Adder_result[31:0])  //o
   );
-  Ram1rw Ps_rgfile (
-    .rd     (pe_ctrl_ps_rd        ), //i
+  QNT_unit qnt (
+    .enable      (pe_ctrl_ps_scale_en        ), //i
+    .indata      (adder_out_payload[31:0]    ), //i
+    .shift_scale (pe_shift_scale_payload[4:0]), //i
+    .quant_data  (qnt_quant_data[31:0]       )  //o
+  );
+  Ram1r1w Ps_rgfile (
+    .rd     (ps_true_rd_en        ), //i
     .wr     (pe_ctrl_ps_wr        ), //i
-    .addr   (pe_ctrl_ps_addr[6:0] ), //i
+    .waddr  (pe_ctrl_ps_waddr[6:0]), //i
+    .raddr  (pe_ctrl_ps_raddr[6:0]), //i
     .wdata  (Ps_rgfile_wdata[31:0]), //i
     .rdata  (Ps_rgfile_rdata[31:0]), //o
     .clk    (clk                  ), //i
     .resetn (resetn               )  //i
-  );
-  QNT_unit qnt (
-    .indata      (ps_rf_rdata_payload[31:0]), //i
-    .shift_scale (pe_ctrl_shift_scale[4:0] ), //i
-    .quant_data  (qnt_quant_data[7:0]      )  //o
   );
   assign bias_Mul_valid = pe_bias_in_valid;
   assign bias_Mul_payload = pe_bias_in_payload[7 : 0];
@@ -91,7 +104,7 @@ module pe_unit (
   assign MA_AfterMux_payload = (pe_ctrl_ps_back_en ? pe_ofmap_out_payload : pe_ifmap_in_payload);
   assign MB_AfterMux_valid = (pe_ctrl_bias_mul_en ? bias_Mul_valid : pe_weight_in_valid);
   assign MB_AfterMux_payload = (pe_ctrl_bias_mul_en ? bias_Mul_payload : pe_weight_in_payload);
-  assign pe_flags_ps_rd_ready = MA_AfterMux_valid_regNext;
+  assign pe_flags_ps_rd_ready = MA_AfterMux_valid;
   assign Mul_finish = Multiplier_finish;
   assign Mul_out_payload = Multiplier_dout;
   assign Mul_out_valid = Multiplier_dout_vld;
@@ -99,18 +112,20 @@ module pe_unit (
   assign mul_out_ext = {{16{Mul_out_payload[15]}}, Mul_out_payload};
   assign adder_out_payload = Adder_result;
   assign adder_out_valid = Mul_out_valid;
-  assign Ps_rgfile_wdata = adder_out_payload;
-  assign ps_rf_rdata_payload = Ps_rgfile_rdata;
-  assign ps_rf_rdata_valid = pe_ctrl_ps_rd_regNext;
-  assign bias_Adder = (pe_ctrl_ps_outer_en ? pe_bias_in_payload : ps_rf_rdata_payload);
+  assign adder_pinA = (pe_ctrl_ps_pinA_bias_en ? pe_bias_in_payload : mul_out_ext);
+  assign ps_true_rd_en = (pe_ctrl_ps_rd && pe_ctrl_ps_allow_rd);
+  assign Ps_rgfile_wdata = qnt_quant_data;
+  assign ps_rf_rdata_payload = (ps_true_rd_en ? tmp_ps_rf_rdata_payload : tmp_ps_rf_rdata_payload_1);
+  assign ps_rf_rdata_valid = ps_true_rd_en_regNext;
+  assign adder_pinB = (pe_ctrl_ps_pinB_bias_en ? pe_bias_in_payload : ps_rf_rdata_payload);
   assign pe_ofmap_out_valid = ps_rf_rdata_valid;
-  assign pe_ofmap_out_payload = qnt_quant_data;
+  assign pe_ofmap_out_payload = ps_rf_rdata_payload[7 : 0];
   always @(posedge clk or negedge resetn) begin
     if(!resetn) begin
       Mula <= 8'h0;
       Mulb <= 8'h0;
       MA_AfterMux_valid_regNext <= 1'b0;
-      pe_ctrl_ps_rd_regNext <= 1'b0;
+      ps_true_rd_en_regNext <= 1'b0;
     end else begin
       if(MA_AfterMux_valid) begin
         Mula <= MA_AfterMux_payload;
@@ -119,17 +134,45 @@ module pe_unit (
         Mulb <= MB_AfterMux_payload;
       end
       MA_AfterMux_valid_regNext <= MA_AfterMux_valid;
-      pe_ctrl_ps_rd_regNext <= pe_ctrl_ps_rd;
+      ps_true_rd_en_regNext <= ps_true_rd_en;
     end
   end
 
 
 endmodule
 
+module Ram1r1w (
+  input               rd,
+  input               wr,
+  input      [6:0]    waddr,
+  input      [6:0]    raddr,
+  input      [31:0]   wdata,
+  output     [31:0]   rdata,
+  input               clk,
+  input               resetn
+);
+
+  wire       [31:0]   ram_readData;
+
+  regMem1r1w ram (
+    .writeValid (wr                ), //i
+    .readValid  (rd                ), //i
+    .waddress   (waddr[6:0]        ), //i
+    .raddress   (raddr[6:0]        ), //i
+    .writeData  (wdata[31:0]       ), //i
+    .readData   (ram_readData[31:0]), //o
+    .clk        (clk               ), //i
+    .resetn     (resetn            )  //i
+  );
+  assign rdata = ram_readData;
+
+endmodule
+
 module QNT_unit (
+  input               enable,
   input      [31:0]   indata,
   input      [4:0]    shift_scale,
-  output     [7:0]    quant_data
+  output     [31:0]   quant_data
 );
 
   wire       [31:0]   roundtoinf_indata;
@@ -140,24 +183,18 @@ module QNT_unit (
   wire       [4:0]    tmp_scale_abs_2;
   wire       [0:0]    tmp_scale_abs_3;
   wire       [31:0]   tmp_indata_after_shift;
-  wire       [24:0]   tmp_when_SInt_l131;
-  wire       [23:0]   tmp_when_SInt_l137;
+  wire       [31:0]   tmp_indata_after_round;
   wire                isSign;
   wire       [4:0]    scale_abs;
   wire       [31:0]   indata_after_shift;
   wire       [31:0]   indata_after_round;
-  reg        [7:0]    tmp_quant_data;
-  wire                when_SInt_l130;
-  wire                when_SInt_l131;
-  wire                when_SInt_l137;
 
   assign tmp_scale_abs = (shift_scale[4] ? tmp_scale_abs_1 : shift_scale);
   assign tmp_scale_abs_1 = (~ shift_scale);
   assign tmp_scale_abs_3 = shift_scale[4];
   assign tmp_scale_abs_2 = {4'd0, tmp_scale_abs_3};
   assign tmp_indata_after_shift = ($signed(indata) <<< scale_abs);
-  assign tmp_when_SInt_l131 = indata_after_round[31 : 7];
-  assign tmp_when_SInt_l137 = indata_after_round[30 : 7];
+  assign tmp_indata_after_round = roundtoinf_outdata;
   RoundToInf_unit roundtoinf (
     .indata    (roundtoinf_indata[31:0]  ), //i
     .roundbits (roundtoinf_roundbits[4:0]), //i
@@ -168,52 +205,8 @@ module QNT_unit (
   assign indata_after_shift = (isSign ? indata : tmp_indata_after_shift);
   assign roundtoinf_indata = indata_after_shift;
   assign roundtoinf_roundbits = (isSign ? scale_abs : 5'h0);
-  assign indata_after_round = roundtoinf_outdata;
-  assign when_SInt_l130 = indata_after_round[31];
-  assign when_SInt_l131 = (! (&tmp_when_SInt_l131));
-  always @(*) begin
-    if(when_SInt_l130) begin
-      if(when_SInt_l131) begin
-        tmp_quant_data = 8'h80;
-      end else begin
-        tmp_quant_data = indata_after_round[7 : 0];
-      end
-    end else begin
-      if(when_SInt_l137) begin
-        tmp_quant_data = 8'h7f;
-      end else begin
-        tmp_quant_data = indata_after_round[7 : 0];
-      end
-    end
-  end
-
-  assign when_SInt_l137 = (|tmp_when_SInt_l137);
-  assign quant_data = tmp_quant_data;
-
-endmodule
-
-module Ram1rw (
-  input               rd,
-  input               wr,
-  input      [6:0]    addr,
-  input      [31:0]   wdata,
-  output     [31:0]   rdata,
-  input               clk,
-  input               resetn
-);
-
-  wire       [31:0]   ram_readData;
-
-  regMem1rw ram (
-    .writeValid (wr                ), //i
-    .readValid  (rd                ), //i
-    .address    (addr[6:0]         ), //i
-    .writeData  (wdata[31:0]       ), //i
-    .readData   (ram_readData[31:0]), //o
-    .clk        (clk               ), //i
-    .resetn     (resetn            )  //i
-  );
-  assign rdata = ram_readData;
+  assign indata_after_round = (enable ? tmp_indata_after_round : indata);
+  assign quant_data = indata_after_round;
 
 endmodule
 
@@ -280,6 +273,36 @@ module multiplier_wrap (
 
 endmodule
 
+module regMem1r1w (
+  input               writeValid,
+  input               readValid,
+  input      [6:0]    waddress,
+  input      [6:0]    raddress,
+  input      [31:0]   writeData,
+  output     [31:0]   readData,
+  input               clk,
+  input               resetn
+);
+
+  reg        [31:0]   tmp_mem_port1;
+  reg [31:0] mem [0:127];
+
+  always @(posedge clk) begin
+    if(writeValid) begin
+      mem[waddress] <= writeData;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(readValid) begin
+      tmp_mem_port1 <= mem[raddress];
+    end
+  end
+
+  assign readData = tmp_mem_port1;
+
+endmodule
+
 module RoundToInf_unit (
   input      [31:0]   indata,
   input      [4:0]    roundbits,
@@ -302,35 +325,6 @@ module RoundToInf_unit (
   assign isZero = (roundbits == 5'h0);
   assign decide_bit = {31'h0,indata[tmp_decide_bit]};
   assign outdata = (isZero ? indata : tmp_outdata);
-
-endmodule
-
-module regMem1rw (
-  input               writeValid,
-  input               readValid,
-  input      [6:0]    address,
-  input      [31:0]   writeData,
-  output     [31:0]   readData,
-  input               clk,
-  input               resetn
-);
-
-  reg        [31:0]   tmp_mem_port1;
-  reg [31:0] mem [0:127];
-
-  always @(posedge clk) begin
-    if(writeValid) begin
-      mem[address] <= writeData;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(readValid) begin
-      tmp_mem_port1 <= mem[address];
-    end
-  end
-
-  assign readData = tmp_mem_port1;
 
 endmodule
 

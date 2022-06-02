@@ -43,13 +43,14 @@ case class regfile(DATAWD: Int , SIZE: Int ) extends Component{
   io.rbus.rdata := rf.io.rdata
 }
 
-
-case class Ifscp_ctrl (cfg: NPUConfig) extends Bundle with IMasterSlave{
+class Ifscp_ctrl (cfg: NPUConfig) extends Bundle{
   val if_rd   =  Bool
   val hw_addr =  UInt(cfg.IFSCP_ADDRWD bits)
   val ich_addr =  UInt(log2Up(cfg.ARRAY_COL_NUM) bits)
   val cast_mode = Bool
-  
+}
+
+case class Ifscp_ctrl_bus (cfg: NPUConfig) extends Ifscp_ctrl(cfg) with IMasterSlave{
   override def asMaster(): Unit = out(this)
 }
 
@@ -57,7 +58,7 @@ case class Ifscp_ctrl (cfg: NPUConfig) extends Bundle with IMasterSlave{
 class If_scratch_pad (cfg: NPUConfig) extends Component{
   val io = new Bundle {
     val ifscp_wbus = slave(RF_wbus(cfg.IFSCP_ADDRWD, cfg.IFSCP_BUS_WD))
-    val ifscp_ctrl = slave(Ifscp_ctrl(cfg))
+    val ifscp_ctrl = slave(Ifscp_ctrl_bus(cfg))
     val if_pe_bus  = out Vec(Bits(cfg.PE_FMAP_WD bits), cfg.ARRAY_COL_NUM)
   }
   noIoPrefix()

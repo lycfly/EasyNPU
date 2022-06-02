@@ -14,11 +14,14 @@ class PeControls (cfg: NPUConfig) extends Bundle with IMasterSlave{
   val ps_raddr = UInt(log2Up(cfg.PE_PSUM_NUM) bits)
   val ps_wr   = Bool
   val ps_rd   = Bool
-  val ps_outer_en = Bool
+  val ps_allow_rd = Bool
+  val ps_pinA_bias_en = Bool  
+  val ps_pinB_bias_en = Bool
   val byp_mul_en = Bool
   val maxpool_en = Bool
   val bias_mul_en = Bool
-  val shift_scale = SInt(cfg.PE_SCALE_WD bits)
+  val ps_scale_en = Bool
+
 }
 
 class PeFlags () extends Bundle with IMasterSlave{
@@ -78,6 +81,7 @@ class RoundToInf_unit (DATAWD: Int, SIGNED: Boolean) extends Component {
 
 class QNT_unit (DIn_WD: Int, DOut_WD: Int, DSc_WD: Int) extends Component {
   val io = new Bundle {
+   val enable = in Bool()
    val indata = in SInt(DIn_WD bits)
    val shift_scale = in SInt(DSc_WD bits)
    val quant_data = out  SInt(DOut_WD bits)
@@ -92,7 +96,7 @@ class QNT_unit (DIn_WD: Int, DOut_WD: Int, DSc_WD: Int) extends Component {
   val roundtoinf = new RoundToInf_unit(DATAWD = DIn_WD, SIGNED= true)
   roundtoinf.io.indata := indata_after_shift.asBits
   roundtoinf.io.roundbits := Mux(isSign, scale_abs, U(0))
-  indata_after_round := roundtoinf.io.outdata.asSInt
+  indata_after_round := Mux(io.enable, roundtoinf.io.outdata.asSInt, io.indata)
 
   io.quant_data := indata_after_round.sat(DIn_WD-DOut_WD)
 
@@ -103,6 +107,7 @@ class pe_unit (cfg: NPUConfig) extends Component {
    val pe_weight_in = slave Flow(SInt(cfg.PE_WEIGHT_WD bits))
    val pe_ifmap_in = slave Flow(SInt(cfg.PE_FMAP_WD bits))
    val pe_bias_in = slave Flow(SInt(cfg.PE_BIAS_WD bits))
+   val pe_shift_scale = slave Flow(SInt(cfg.PE_SCALE_WD bits))
    val pe_ofmap_out = master Flow(SInt(cfg.PE_FMAP_WD bits))
    val pe_ctrl = slave(new PeControls(cfg=cfg))
    val pe_flags = master(new PeFlags())
@@ -113,7 +118,8 @@ class pe_unit (cfg: NPUConfig) extends Component {
 
   val Multiplier =  multiplier_wrap(
        MulConfig(SIZEINA = cfg.PE_WEIGHT_WD, SIZEINB = cfg.PE_FMAP_WD, cfg.PE_MUL_Vender))
-
+  
+  // Multiplier
   val Mula = Reg(SInt(cfg.PE_FMAP_WD bits)) init(0)
   val Mulb = Reg(SInt(cfg.PE_WEIGHT_WD bits)) init(0)
   val MA_AfterMux = Flow(SInt(cfg.PE_FMAP_WD bits))
@@ -133,44 +139,52 @@ class pe_unit (cfg: NPUConfig) extends Component {
       Mulb := MB_AfterMux.payload
   }
 
-  io.pe_flags.ps_rd_ready := RegNext(MA_AfterMux.valid) init(false)
+  io.pe_flags.ps_rd_ready := MA_AfterMux.valid
   
   Multiplier.io.dinA := Mula
   Multiplier.io.dinB := Mulb
-  Multiplier.io.din_vld := io.pe_flags.ps_rd_ready // can be modified
+  Multiplier.io.din_vld := RegNext(MA_AfterMux.valid) init(false) // can be modified
   Mul_finish := Multiplier.io.finish 
   Mul_out.payload := Multiplier.io.dout
   Mul_out.valid := Multiplier.io.dout_vld
   io.pe_flags.ps_wr_ready := Mul_finish
 
+  // Adder
   val Adder = new adder_unit(cfg)
   val adder_out = Flow(SInt(cfg.PE_PSUM_WD bits))
   val mul_out_ext = Mul_out.payload.resize(cfg.PE_PSUM_WD)
-  val bias_Adder = SInt(cfg.PE_PSUM_WD bits)
-  Adder.io.pinA := mul_out_ext
-  Adder.io.pinB := bias_Adder
+  val adder_pinB = SInt(cfg.PE_PSUM_WD bits)
+  val adder_pinA = SInt(cfg.PE_PSUM_WD bits)
+  Adder.io.pinA := adder_pinA
+  Adder.io.pinB := adder_pinB
   Adder.io.maxpool_en := io.pe_ctrl.maxpool_en
   adder_out.payload := Adder.io.result
   adder_out.valid := Mul_out.valid
+  adder_pinA :=  Mux(io.pe_ctrl.ps_pinA_bias_en, io.pe_bias_in.payload, mul_out_ext)
 
+  // Quant
+  val qnt = new QNT_unit(DIn_WD = cfg.PE_PSUM_WD, DOut_WD = cfg.PE_PSUM_WD, DSc_WD = cfg.PE_SCALE_WD)
+  qnt.io.indata := adder_out.payload
+  qnt.io.shift_scale :=  io.pe_shift_scale.payload
+  qnt.io.enable := io.pe_ctrl.ps_scale_en
+
+  // Psum 
   val Ps_rgfile = new Ram1r1w(MemConfig(DATAWD = cfg.PE_PSUM_WD,SIZE = cfg.PE_PSUM_NUM,MemVender = REGMEM))
   val ps_rf_rdata = Flow(SInt(cfg.PE_PSUM_WD bits))
+  val ps_true_rd_en = Bool()
+  ps_true_rd_en := io.pe_ctrl.ps_rd & io.pe_ctrl.ps_allow_rd
   Ps_rgfile.io.waddr := io.pe_ctrl.ps_waddr
   Ps_rgfile.io.raddr := io.pe_ctrl.ps_raddr
   Ps_rgfile.io.wr := io.pe_ctrl.ps_wr
-  Ps_rgfile.io.rd := io.pe_ctrl.ps_rd
-  Ps_rgfile.io.wdata := adder_out.payload.asBits
-  ps_rf_rdata.payload := Ps_rgfile.io.rdata.asSInt
-  ps_rf_rdata.valid := RegNext(io.pe_ctrl.ps_rd) init(false)
-  bias_Adder :=  Mux(io.pe_ctrl.ps_outer_en, io.pe_bias_in.payload, ps_rf_rdata.payload)
+  Ps_rgfile.io.rd := ps_true_rd_en
+  Ps_rgfile.io.wdata := qnt.io.quant_data.asBits
+  ps_rf_rdata.payload := Mux(ps_true_rd_en, Ps_rgfile.io.rdata.asSInt, S(0))
+  ps_rf_rdata.valid := RegNext(ps_true_rd_en) init(false)
+  adder_pinB :=  Mux(io.pe_ctrl.ps_pinB_bias_en, io.pe_bias_in.payload, ps_rf_rdata.payload)
 
-  val qnt = new QNT_unit(DIn_WD = cfg.PE_PSUM_WD, DOut_WD = cfg.PE_FMAP_WD, DSc_WD = cfg.PE_SCALE_WD)
-  qnt.io.indata := ps_rf_rdata.payload
-  qnt.io.shift_scale := io.pe_ctrl.shift_scale
-  
 
   io.pe_ofmap_out.valid := ps_rf_rdata.valid
-  io.pe_ofmap_out.payload := qnt.io.quant_data
+  io.pe_ofmap_out.payload := ps_rf_rdata.payload(cfg.PE_FMAP_WD-1 downto 0)
 
 }
 

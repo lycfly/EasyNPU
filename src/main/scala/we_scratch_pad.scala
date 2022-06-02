@@ -5,17 +5,19 @@ import spinal.lib.fsm._
 import spinal.lib._
 import scala.collection.mutable.ArrayBuffer
 
-case class Wescp_ctrl (cfg: NPUConfig) extends Bundle with IMasterSlave{
+class Wescp_ctrl (cfg: NPUConfig) extends Bundle{
   val we_rd   =  Bool
-  val och_gcnt =  UInt(log2Up(cfg.ARRAY_COL_NUM) bits)
-  
+  val och_gcnt =  UInt(cfg.SUBOCH_WD bits)
+}
+
+case class Wescp_ctrl_bus (cfg: NPUConfig) extends Wescp_ctrl(cfg) with IMasterSlave{
   override def asMaster(): Unit = out(this)
 }
 
 class We_scratch_pad (cfg: NPUConfig) extends Component{
     val io = new Bundle {
     val wescp_wbus = slave(RF_wbus(cfg.WESCP_ADDRWD, cfg.WESCP_BUS_WD))
-    val wescp_ctrl = slave(Wescp_ctrl(cfg))
+    val wescp_ctrl = slave(Wescp_ctrl_bus(cfg))
     val we_pe_bus  = out Vec(Bits(cfg.PE_WEIGHT_WD bits), cfg.ARRAY_COL_NUM)
   }
   noIoPrefix()
