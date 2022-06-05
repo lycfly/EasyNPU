@@ -156,10 +156,10 @@ for(i = 0; i < B; i += b)               // Batch tiling
       }
 ```
 
-+ EasyNPU为了简洁的原则，固定k和z为16。也就是说每次都固定从Ifmap中取出16个Input Channel的数据，并计算出16个Output Channel的结果。
++ EasyNPU为了简洁的原则，固定k为16。也就是说每次都固定从Ifmap中取出16个Input Channel的数据
 + 对于某些简单的推理任务，例如串行的音频流数据，Batch Size通常可以直接取1。因此上面的卷积循环可以忽略最外层的Batch循环。
 
-外层的四层循环我们将其交给Scheduler完成，PE控制器主要负责内层的循环，也就是计算下图所示的部分卷积：
+外层的四层循环我们将其交给总控制器完成，PE控制器主要负责内层的循环，也就是计算下图所示的部分卷积：
 <center>
 <img src="/docs/images/pe_pass_ctrl.drawio.svg" width = "600" height = "400" alt="ifmap ctrl"/>
 </center>
@@ -237,22 +237,28 @@ EasyNPU的假定输入图通过If_Bus已经分批送入了Ifmap_scratch_pad中�
 
 PE控制器完成普通卷积的流程用伪代码表示如下：
 ```C++
-for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
-  for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
-    for(kzi = 0; kzi < k; kzi ++)     // Inner input channel tiling
+for(kz = 0; kz < Ci; kz += k){  // Inner tiling
+  for(kzi = 0; kzi < k; kzi ++)     // Inner input channel tiling
+    for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
+      for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
 
-      for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
-        for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
-          for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
-            // Every PE's behavior is same
-            PEs_ifmap_in=IF_PAD[kzi][sh*oyi][sw*oxi]
-            PEs_weight_in=W_PAD[ozi]
-            Psum_PADs[ozi][oyi][oxi] += PEs_ifmap_in * PEs_weight_in
+          for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
+            for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
+              for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
+                // Every PE's behavior is same
+                PEs_ifmap_in=IF_PAD[kzi][sh*oyi][sw*oxi]
+                PEs_weight_in=W_PAD[ozi]
+                Psum_PADs[ozi][oyi][oxi] += PEs_ifmap_in * PEs_weight_in
     }
 Psum_PADs[:z][:y][:x] transfer to DTCM
 ```
 上面的循环中输出通道循环次数只有zs次，这是因为有zp(16)个PE，因此只需要循环一次就可以获得zp个输出，zs次循环就能算完z个输出通道。
 另外，K循环紧接着zs的循环，保证weight buffer中的数据复用。（当depthwise卷积时没有这部分复用，k循环相当于被展开了）
++ 注意这里将Ci循环也加入了PE控制器的循环，主要是因为只有遍历完输入通道才能得到完整的输出图，因此在该循环结束后，需要将PE置为量化执行模式（如果网络是量化过的）。
++ 在量化执行模式下，必须打断卷积循环，将weight bus复用为量化参数的读取总线，weight bus将bias和scale从DTCM的特定位置读入weight buffer中的量化存储区。
++ 将weight bus复用为量化参数读入总线之前，weight bus实际上不应该是空闲的，而是在预取下一次卷积需要的weight参数，因此在进入量化模式时weight bus应该是空闲的，可以用来载入量化参数。
++ 之所以不给量化参数附加一组总线是因为复用weight bus开销很小，无论是硬件资源还是对性能的影响上，都是可以忽略的。性能影响主要是因为bias是多Byte的，以32bit为例。取完bias和scale需要5个周期（4+1），而量化执行需要一个周期，所以总共需要6个周期完成一次量化。
++ 量化执行实际上是一次子循环，需要遍历zs，y,x三层循环。在每次
 ### GroupConv的支持（TBD）
 实际上，普通卷积和Depthwise卷积应该都是GroupConv的一个特例。普通卷积对应group=Ci, 而Depthwise卷积对应group=1。因此NPU应该实现更一般的GroupConv，通过指定Group参数来实现其他类型的卷积。
 对Group的支持只需要将PE控制器伪代码最外层的k循环的上限换成gc即可。
@@ -500,9 +506,9 @@ for(i = 0; i < B; i += b)               // Batch tiling
               else
                 Ifmap_bus = Padding_value(0)
           // PE Ctrl
-          for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
-            for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
-              for(kzi = 0; kzi < k; kzi ++)     // Inner input channel tiling
+          for(kzi = 0; kzi < k; kzi ++)     // Inner input channel tiling
+            for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
+              for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
 
                 for(fi=0; fi < fuse_n; fi ++)     // layer fusion loop
                   for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 

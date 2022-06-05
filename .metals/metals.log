@@ -28316,3 +28316,215 @@ java.lang.NullPointerException
 2022.06.02 21:31:38 INFO  Canceling debug proxy for [pe_gen][0m
 2022.06.02 21:31:55 INFO  compiling easynpu (1 scala source)[0m
 2022.06.02 21:31:56 INFO  time: compiled easynpu in 1.04s[0m
+2022.06.02 23:48:54 INFO  shutting down Metals[0m
+2022.06.02 23:48:54 INFO  Shut down connection with build server.[0m
+2022.06.02 23:48:54 INFO  Shut down connection with build server.[0m
+2022.06.03 12:45:47 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.06.03 12:45:47 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.06.03 12:45:47 INFO  Started: Metals version 0.11.5 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.06.03 12:45:48 INFO  time: initialize in 0.83s[0m
+2022.06.03 12:45:49 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.06.03 12:45:49 INFO  Attempting to connect to the build server...[0m
+2022.06.03 12:45:49 INFO  skipping build import with status 'Installed'[0m
+2022.06.03 12:45:52 INFO  no build target found for /mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala. Using presentation compiler with project's scala-library version: 3.1.2[0m
+2022.06.03 12:45:53 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.03 12:45:53 INFO  Attempting to connect to the build server...[0m
+2022.06.03 12:45:53 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/project/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.03 12:45:53 INFO  time: Connected to build server in 4.2s[0m
+2022.06.03 12:45:53 INFO  Connected to Build server: Bloop v1.5.0[0m
+2022.06.03 12:45:54 INFO  time: Imported build in 0.23s[0m
+2022.06.03 12:45:54 INFO  time: code lens generation in 4.86s[0m
+2022.06.03 12:45:56 INFO  time: indexed workspace in 2.24s[0m
+2022.06.03 13:01:46 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 13:01:47 INFO  time: compiled easynpu in 1.11s[0m
+2022.06.03 13:02:05 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 13:02:08 INFO  file:///mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala:317:9: stale bloop warning: a pure expression does nothing in statement position; you may be omitting necessary parentheses
+        pe_ctrl_rgs.ps_pinA_bias_en
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2022.06.03 13:02:08 INFO  file:///mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala:317:9: stale bloop warning: a pure expression does nothing in statement position; you may be omitting necessary parentheses
+        pe_ctrl_rgs.ps_pinA_bias_en
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2022.06.03 13:02:08 INFO  file:///mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala:317:9: stale bloop warning: a pure expression does nothing in statement position; you may be omitting necessary parentheses
+        pe_ctrl_rgs.ps_pinA_bias_en
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2022.06.03 13:02:08 INFO  file:///mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala:317:9: stale bloop warning: a pure expression does nothing in statement position; you may be omitting necessary parentheses
+        pe_ctrl_rgs.ps_pinA_bias_en
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2022.06.03 13:02:08 INFO  file:///mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala:317:9: stale bloop warning: a pure expression does nothing in statement position; you may be omitting necessary parentheses
+        pe_ctrl_rgs.ps_pinA_bias_en
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2022.06.03 13:02:09 INFO  file:///mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala:317:9: stale bloop warning: a pure expression does nothing in statement position; you may be omitting necessary parentheses
+        pe_ctrl_rgs.ps_pinA_bias_en
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2022.06.03 13:02:09 INFO  file:///mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala:317:9: stale bloop warning: a pure expression does nothing in statement position; you may be omitting necessary parentheses
+        pe_ctrl_rgs.ps_pinA_bias_en
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2022.06.03 13:02:09 INFO  file:///mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala:317:9: stale bloop warning: a pure expression does nothing in statement position; you may be omitting necessary parentheses
+        pe_ctrl_rgs.ps_pinA_bias_en
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2022.06.03 13:02:10 INFO  file:///mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala:317:9: stale bloop warning: a pure expression does nothing in statement position; you may be omitting necessary parentheses
+        pe_ctrl_rgs.ps_pinA_bias_en
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2022.06.03 13:02:10 INFO  time: compiled easynpu in 4.9s[0m
+2022.06.03 13:02:12 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 13:02:12 WARN  Could not load snapshot text for /mnt/data/projects/npu/EasyNPU/src/main/scala/pe_flow_ctrl.scala[0m
+2022.06.03 13:02:14 INFO  time: compiled easynpu in 2.12s[0m
+2022.06.03 13:02:32 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 13:02:32 INFO  time: compiled easynpu in 0.52s[0m
+2022.06.03 13:02:35 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 13:02:35 INFO  time: compiled easynpu in 0.12s[0m
+2022.06.03 13:02:37 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 13:02:37 INFO  time: compiled easynpu in 0.46s[0m
+2022.06.03 13:02:38 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 13:02:38 INFO  time: compiled easynpu in 0.4s[0m
+2022.06.03 13:02:42 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 13:02:44 INFO  time: compiled easynpu in 1.87s[0m
+2022.06.03 15:04:38 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.06.03 15:04:38 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.06.03 15:04:38 INFO  Started: Metals version 0.11.5 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.06.03 15:04:39 INFO  time: initialize in 0.83s[0m
+2022.06.03 15:04:40 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.06.03 15:04:40 INFO  Attempting to connect to the build server...[0m
+2022.06.03 15:04:40 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.03 15:04:39 INFO  skipping build import with status 'Installed'[0m
+2022.06.03 15:04:39 INFO  Attempting to connect to the build server...[0m
+2022.06.03 15:04:39 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/project/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.03 15:04:39 INFO  time: Connected to build server in 0.29s[0m
+2022.06.03 15:04:39 INFO  Connected to Build server: Bloop v1.5.0[0m
+2022.06.03 15:04:43 INFO  time: indexed workspace in 2.44s[0m
+2022.06.03 15:09:10 INFO  shutting down Metals[0m
+2022.06.03 15:09:10 INFO  Shut down connection with build server.[0m
+2022.06.03 15:09:10 INFO  Shut down connection with build server.[0m
+Jun 03, 2022 5:13:44 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 51
+2022.06.03 17:13:47 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 17:13:47 INFO  time: compiled easynpu in 0.45s[0m
+2022.06.03 17:13:49 INFO  compiling easynpu (1 scala source)[0m
+2022.06.03 17:13:49 INFO  time: compiled easynpu in 0.42s[0m
+2022.06.03 23:37:43 INFO  shutting down Metals[0m
+2022.06.03 23:37:43 INFO  Shut down connection with build server.[0m
+2022.06.03 23:37:43 INFO  Shut down connection with build server.[0m
+2022.06.03 23:38:33 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.06.03 23:38:33 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.06.03 23:38:33 INFO  Started: Metals version 0.11.5 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.06.03 23:38:34 INFO  time: initialize in 0.86s[0m
+2022.06.03 23:38:35 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.06.03 23:38:35 INFO  Attempting to connect to the build server...[0m
+2022.06.03 23:38:35 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.03 23:38:35 INFO  skipping build import with status 'Installed'[0m
+2022.06.03 23:38:35 INFO  Attempting to connect to the build server...[0m
+2022.06.03 23:38:35 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/project/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.03 23:38:35 INFO  time: Connected to build server in 0.25s[0m
+2022.06.03 23:38:35 INFO  Connected to Build server: Bloop v1.5.0[0m
+2022.06.03 23:38:40 INFO  time: indexed workspace in 4.31s[0m
+2022.06.03 23:40:13 INFO  shutting down Metals[0m
+2022.06.03 23:40:13 INFO  Shut down connection with build server.[0m
+2022.06.03 23:40:13 INFO  Shut down connection with build server.[0m
+2022.06.04 10:59:28 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.06.04 10:59:29 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.06.04 10:59:29 INFO  Started: Metals version 0.11.5 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.06.04 10:59:29 INFO  time: initialize in 0.84s[0m
+2022.06.04 10:59:30 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.06.04 10:59:30 INFO  Attempting to connect to the build server...[0m
+2022.06.04 10:59:31 INFO  skipping build import with status 'Installed'[0m
+2022.06.04 10:59:34 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.04 10:59:34 INFO  Attempting to connect to the build server...[0m
+2022.06.04 10:59:34 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/project/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.04 10:59:34 INFO  time: Connected to build server in 3.77s[0m
+2022.06.04 10:59:34 INFO  Connected to Build server: Bloop v1.5.0[0m
+2022.06.04 10:59:34 INFO  time: Imported build in 0.14s[0m
+2022.06.04 10:59:38 INFO  time: indexed workspace in 3.5s[0m
+2022.06.04 23:47:03 INFO  shutting down Metals[0m
+2022.06.04 23:47:03 INFO  Shut down connection with build server.[0m
+2022.06.04 23:47:03 INFO  Shut down connection with build server.[0m
+2022.06.05 13:22:22 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.06.05 13:22:22 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.06.05 13:22:22 INFO  Started: Metals version 0.11.6 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.06.05 13:22:23 INFO  time: initialize in 0.62s[0m
+2022.06.05 13:22:23 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.06.05 13:22:24 INFO  Attempting to connect to the build server...[0m
+2022.06.05 13:22:23 INFO  skipping build import with status 'Installed'[0m
+2022.06.05 13:23:25 ERROR Starting the bsp launcher for bloop...[0m
+2022.06.05 13:23:25 ERROR Opening a bsp server connection with 'bsp --protocol local --socket /tmp/bsp-launcher1913951963301611919/bsp.socket'...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR error: Giving up on waiting for a connection, printing embedded bloop logs:[0m
+2022.06.05 13:23:25 ERROR > No server running at 127.0.0.1:8212, let's fire one...[0m
+2022.06.05 13:23:25 ERROR > Resolving ch.epfl.scala:bloop-frontend_2.12:1.5.0-18-003e6c7b...[0m
+2022.06.05 13:23:25 ERROR error: Trying a tcp-based connection to the server instead...[0m
+2022.06.05 13:23:25 ERROR Opening a bsp server connection with 'bsp --protocol tcp --port 26100'...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR Waiting for the bsp connection to come up...[0m
+2022.06.05 13:23:25 ERROR error: Giving up on waiting for a connection, printing embedded bloop logs:[0m
+2022.06.05 13:23:25 ERROR > No server running at 127.0.0.1:8212, let's fire one...[0m
+2022.06.05 13:23:25 ERROR > Resolving ch.epfl.scala:bloop-frontend_2.12:1.5.0-18-003e6c7b...[0m
+2022.06.05 13:23:25 ERROR error: The launcher failed to establish a bsp connection, aborting...[0m
+2022.06.05 13:23:25 ERROR Failed to connect with build server, no functionality will work.
+java.lang.RuntimeException: The server did not start, got FailedToOpenBspConnection
+	at bloop.launcher.LauncherMain.failPromise$1(Launcher.scala:92)
+	at bloop.launcher.LauncherMain.runLauncher(Launcher.scala:119)
+	at scala.meta.internal.metals.BloopServers$$anon$2.run(BloopServers.scala:434)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+[0m

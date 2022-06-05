@@ -314,7 +314,8 @@ class pe_flow_ctrl (cfg: NPUConfig) extends Component{
       }
     QUANT
       .whenIsActive {
-        
+        pe_ctrl_rgs.ps_pinA_bias_en.set()
+        pe_ctrl_rgs.ps_scale_en.set()
       }
   }
 
