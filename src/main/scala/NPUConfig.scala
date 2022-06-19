@@ -3,23 +3,28 @@ import spinal.lib._
 import breeze.numerics.log2
 
 case class NPUConfig(
+    // Sram config
+                WDTCM_SIZE: Int = 256,
+                WDTCM_WD:   Int = 128,
+
+                FDTCM_SIZE: Int = 400,
+                FDTCM_WD:   Int = 128,
     // PE unit config
                 PE_WEIGHT_WD: Int = 8,
                 PE_FMAP_WD:  Int = 8,
                 PE_BIAS_WD:   Int = 32,
                 PE_PSUM_WD :  Int = 32,
                 PE_PSUM_NUM:  Int = 128,
+                PE_SCALE_WD:  Int = 8,
                 PE_USE_BOOTH: Boolean = true,
                 PE_MUL_Vender: Mulvendor = SimpleMulVendor,   //SimpleMulVendor, MultiplierIPVendor
     // PE array config
                 ARRAY_COL_NUM: Int = 16,
     // IFmap scratch pad config
-                IFSCP_BUS_WD: Int = 128,
                 IFSCP_SIZE:   Int = 64,
     // Weight scratch pad config
-                WESCP_BUS_WD: Int = 128,
                 WESCP_SIZE:   Int = 16,
-
+                SCALE_SIZE:   Int = 16,
     // Flow params config
                 MAX_BATCHSIZE : Int = 256,
                 MAX_HEIGHT:     Int = 256,
@@ -34,8 +39,13 @@ case class NPUConfig(
                 SizePOWin: Array[Int] = Array(1,20,15)
 
 ){
+    val WDTCM_ADDRWD : Int = log2Up(WDTCM_SIZE)
+    val FDTCM_ADDRWD : Int = log2Up(FDTCM_SIZE)
+    val IFSCP_BUS_WD: Int = FDTCM_WD
+    val WESCP_BUS_WD: Int = WDTCM_WD
+
+    val BIAS_BYTE_NUM : Int = (PE_BIAS_WD/PE_WEIGHT_WD).toInt
     val PE_PSUM_ADDRWD: Int = log2Up(PE_PSUM_NUM)
-    val PE_SCALE_WD:  Int = log2Up(PE_BIAS_WD)
     val IFSCP_ADDRWD: Int = log2Up(IFSCP_SIZE)
     val WESCP_ADDRWD: Int = log2Up(WESCP_SIZE)
 

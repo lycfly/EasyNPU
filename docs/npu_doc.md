@@ -137,7 +137,9 @@ Weight的scratch pad与Ifmap类似，同样分成16组，只不过每组的条�
 + 每个weight pad连接到一个PE上，PE所取的weight元素由寄存器weight_och_group_cnt控制。
 + 每次计算时，16个PE计算连续的16个out channel，当算完时，weight_och_group_cnt将加一，切换到下一组16个out channel， 因此每个PE计算的out channel是不连续的，间隔为16。
 + 当算完一组16个out channel时，除了将och group cnt加一，进行下一组的计算，W-Bus需要将下一批weight预取到weight pad中数据用完的位置。
-+ Bias 的数据可以复用weight的通路，利用PE中bias in与乘法器的数据打拍延迟
++ Bias 的数据可以复用weight的通路，但是存储在另外开辟的一组寄存器中。考虑到bias通常是32B，且还有scale参数，因此设定这部分寄存器位宽为32+8bit。条目数同样跟PE内存储的最大输出通道数相同。
++ bias的暂存器涉及一个串行转并行的逻辑，因为weight bus每次只能出16个8bit数，所以需要4次读取才能获得完整的16个Bias。算上scale就是5次。
++ bias可以在PE的第一个Pass导入。
 **TBD**
 
 ## PE控制器
@@ -203,9 +205,9 @@ EasyNPU的假定输入图通过If_Bus已经分批送入了Ifmap_scratch_pad中�
 </center>
 
 1. **Pass 0**: Ifmap的第一个元素广播到PE中，与不同输出通道的卷积核的第一个元素在PE内进行计算，结果存在PE内部的Psum中。
-2. **Pass 1-8**: 各个PE的Weight输入保持不变，变更Ifmap输入，依次计算各输出图的部分卷积。Pass 8结束后PE内实际存储了9\*2个元素，对应两张输出图，但输出图中的每一个元素仅仅是单次卷积计算中的一次乘累加结果。
-3. **Pass 9**: 调度器在Pass 9之前需要导入第三和第四个输出通道的卷积核参数，然后Ifmap又回到第一个元素。另外，由于第一，二个输出通道的卷积核已经算完，可以预取下一批次的一，二通道卷积核进入Weight Pad。
-4. **Pass 10-17**，计算过程与Pass 1-8相同，只是计算的通道不同。计算完后就完成了所有输出图的卷积乘累加的第一次部分结果。
+2. **Pass 1**: 遍历下一批次的输出通道，相当于复用当前的ifmap
+3. **Pass 2-16**: 变更Ifmap输入，依次计算各输出图的部分卷积。Pass 8结束后PE内实际存储了9\*2个元素，对应两张输出图，但输出图中的每一个元素仅仅是单次卷积计算中的一次乘累加结果。
+4. **Pass 17**: 计算卷积核长宽方向的下一个元素与ifmap的乘法，注意从这个pass后psum的数据需要被依次取出并累加上新的计算结果。
 5. **Pass n**: 后续的Pass实际就是在重复上面的0-17，区别在于Weight Pad中的数据在不断被替换，直到卷积核被完全覆盖。
 6. 当计算完一张ifmap后，对应普通卷积来说还需要计算其余输入通道，此时需要将Ifmap Pad切换到下一个通道的Ifmap，再重复上述过程。
 7. 对于具有逐通道计算特性的卷积，例如depthwise，pooling等操作，需要将ifmap Pad的输出方式改为多播，每个Pad连接一个PE。
@@ -242,9 +244,10 @@ for(kz = 0; kz < Ci; kz += k){  // Inner tiling
     for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
       for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
 
-          for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
-            for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
-              for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
+          for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
+            for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
+              for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
+
                 // Every PE's behavior is same
                 PEs_ifmap_in=IF_PAD[kzi][sh*oyi][sw*oxi]
                 PEs_weight_in=W_PAD[ozi]
@@ -395,23 +398,54 @@ Reshape算子不包含计算逻辑，但是会对数据的排列进行修改。�
 
 ### Weight 调度器
 PE控制器完整地负责x\*y\*z大小的输出图计算，但是在计算过程中，weight和ifmap scratch pad都需要预取数据保证PE阵列能够满负荷运作。预取的时机在pe控制器中已经进行了说明。
-对于Weight数据的调度，实际上PE控制器已经负责了大部分工作。PE控制器的内部循环可以覆盖k,Wk,Hk,z循环，需要Weight调度器负责的就是将z和k转换到Weight DTCM中，需要加上通道方向的历史数据(oz,kz）来索引DTCM中的Fmap和Weight，对应的控制伪代码如下：
+对于Weight数据的调度，实际上PE控制器已经负责了大部分工作。PE控制器的内部循环可以覆盖k,Wk,Hk,z循环，需要Weight调度器负责的就是将pass所需的weight提前从到Weight DTCM中取到weight pad中（需要加上通道方向的历史数据(oz,kz）来索引DTCM中d的Weight），对应的控制伪代码如下：
 ```C++
 for(i = 0; i < B; i += b)               // Batch tiling
   for(oz = 0; oz < Co; oz += z)         // Output Channel tiling
     for(oy = 0; oy < Ho; oy += y)       // Output Row tiling
       for(ox = 0; ox < Wo; ox += x)     // Output column tiling
-        for(kz = 0; kz < Ci; kz += k){  // Input Channel tiling
-            kxi = PE_Ctrl_kxi
-            hki = PE_Ctrl_hki
-            wki = PE_Ctrl_wki
-            oyi = PE_Ctrl_oyi
-            oxi = PE_Ctrl_oxi
-            ozi = PE_Ctrl_ozi  // iterator of zs tiling                     
-            weight_bus =
-             Weight_DTCM[kz+kzi][hki][wki][oz+ozi*zp:oz+(ozi+1)*zp-1] 
+        // weight shedule 
+        for(kz = 0; kz < Ci; kz += 1){  // Input Channel tiling
+          for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
+            for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
+              for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
+            
+                weight_bus =
+                Weight_DTCM[kz+kzi][hki][wki][oz+ozi*zp:oz+(ozi+1)*zp-1] 
         }   
 ```
+
+
+
+weight调度器内部由状态机控制。根据开始信号开始调度。在第一次读入weight数据时，weight shedule先连续地读入zs\*zp个weight数据。由于zp（16）是weight bus的总线Byte数，所以最开始需要连续读入zs次weight数据。
+此后，由于PE计算的顺序需要依次遍历完oz,ox,oy三层循环之后才需要用到新的weight，因此在wki递增之前的那次ozi循环需要prefetch数据进来，保证wki递增后weight pad内的数据是更新的。
+
+weight调度器内部维护一个四层的循环，接收pe ctrl主循环的标志位更新这四层循环。
+
+#### Bias与Scale shedule
+Bias与Scale作为量化参数，需要先导入到weight pad内部的bs和sc pad中。为了简化电路，考虑复用weight bus导入这两部分数据。Bias只需要在每次subconv计算结果上做一次累加，有两个选择，可以在算完psum后累加，也可以在开始算之前作为初始值给psum。如果是最后累加，会增加一次读Ps regfile的操作，因此比较合适的做法是在第一次遍历所有psum时，将bias作为外部加数送入加法器。因为第一次计算得到的psum不需要读取ps regfile来做累加，因此这种做法可以将bias的累加时间隐藏到第一次计算psum中。
+当然，由于第一次计算psum就需要累加Bias，所以在subconv开始之前就应该把bias导入到bs pad中。看起来也会引入延时，但是好处是只要subconv最后才遍历Co,那么之后相同输出通道的subconv就不需要再重复导入bias，且subconv内部的bias累加延时也被优化掉了。
+Scale的情况则与Bias不同，因为量化只会在最后一次psum算完后才会做，所以Scale只需要在最后一轮psum计算时导入即可。这么做当然可以最大限度地节省时间，但是考虑到复杂度，EasyNPU还是将scale的导入与bias导入合并在一起，也就是在subconv开始时导入这两部分数据。
+
+
+#### Weight Schedule状态机
+
+```mermaid
+stateDiagram-v2
+IDLE --> LOAD_BS:  layer_start
+LOAD_BS --> PRE_FETCH: bs_load_end & ~isfirst
+LOAD_BS --> FIRST_FETCH: bs_load_end & isfirst
+
+FIRST_FETCH --> PRE_FETCH: first_end
+PRE_FETCH --> LOAD_BS: subconv_end & oz_inc
+PRE_FETCH --> IDLE: layer_end
+
+```
+
++ 当PE还在计算完一个subconv而Weight schedule处于LOAD_BS状态时，subconv应该暂停，否则可能在load bias途中错过prefetch的时机。
+
+
+
 ## 总控制器
 
 
@@ -485,9 +519,10 @@ for(i = 0; i < B; i += b)               // Batch tiling
 
 EasyNPU的控制流的粒度是非常粗的，直接以一层为一条指令，相比于CPU和GPU而言这么做的好处是可以减少编译器的设计难度和复杂度，缺点是单条指令长度需要操作的寄存器非常多。指令长度也较长（~128bit)。
 EasyNPU的指令格式为：
+
 <center>
 <img src="/docs/images/wavedrom_opcode.png" alt="opcode"/>
-</center>
+</center> 
 
 整个EasyNPU的控制逻辑可以抽象为如下的伪代码：
 ```C++
@@ -511,9 +546,9 @@ for(i = 0; i < B; i += b)               // Batch tiling
               for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
 
                 for(fi=0; fi < fuse_n; fi ++)     // layer fusion loop
-                  for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
-                    for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
-                      for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
+                  for(oyi = 0; oyi < y; oyi ++)       // Inner Output Row tiling
+                    for(oxi = 0; oxi < x; oxi ++){    // Inner Output column tiling
+                      for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
                         // Every PE's behavior is same
                         if(fi == 0){ // Conv/MLP
                           weight_bus = Weight_DTCM[kz+kzi][hki][wki][oz+ozi*zp:oz+(ozi+1)*zp-1] 

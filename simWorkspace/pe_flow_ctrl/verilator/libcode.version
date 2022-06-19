@@ -1,0 +1,4 @@
+CODEABI_1.0 {
+    global: Java_wrapper_1verilator_VerilatorNative_*;
+    local: *;
+};
