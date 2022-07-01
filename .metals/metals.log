@@ -36227,3 +36227,104 @@ WARNING: Unmatched cancel notification for request id 8888
 2022.06.19 20:11:14 INFO  time: compiled easynpu in 78ms[0m
 2022.06.19 20:11:16 INFO  compiling easynpu (1 scala source)[0m
 2022.06.19 20:11:16 INFO  time: compiled easynpu in 0.89s[0m
+2022.06.19 22:38:39 INFO  shutting down Metals[0m
+2022.06.19 22:38:39 INFO  Shut down connection with build server.[0m
+2022.06.19 22:38:39 INFO  Shut down connection with build server.[0m
+2022.06.20 11:00:30 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.06.20 11:00:31 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.06.20 11:00:31 INFO  Started: Metals version 0.11.6 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.06.20 11:00:32 INFO  time: initialize in 0.64s[0m
+2022.06.20 11:00:32 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.06.20 11:00:33 INFO  Attempting to connect to the build server...[0m
+2022.06.20 11:00:33 INFO  skipping build import with status 'Installed'[0m
+2022.06.20 11:00:36 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.20 11:00:36 INFO  Attempting to connect to the build server...[0m
+2022.06.20 11:00:36 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/project/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.20 11:00:36 INFO  time: Connected to build server in 3.73s[0m
+2022.06.20 11:00:36 INFO  Connected to Build server: Bloop v1.5.0-18-003e6c7b[0m
+2022.06.20 11:00:36 INFO  time: Imported build in 0.11s[0m
+2022.06.20 11:00:40 INFO  time: indexed workspace in 3.96s[0m
+2022.06.20 21:52:50 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.06.20 21:52:50 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.06.20 21:52:50 INFO  Started: Metals version 0.11.6 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.06.20 21:52:51 INFO  time: initialize in 0.57s[0m
+2022.06.20 21:52:51 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.06.20 21:52:51 INFO  Attempting to connect to the build server...[0m
+2022.06.20 21:52:51 INFO  skipping build import with status 'Installed'[0m
+2022.06.20 21:52:52 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.20 21:52:52 INFO  Attempting to connect to the build server...[0m
+2022.06.20 21:52:52 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/project/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.20 21:52:52 INFO  time: Connected to build server in 0.27s[0m
+2022.06.20 21:52:52 INFO  Connected to Build server: Bloop v1.5.0-18-003e6c7b[0m
+2022.06.20 21:52:54 INFO  time: indexed workspace in 2.29s[0m
+2022.06.20 23:27:46 INFO  shutting down Metals[0m
+2022.06.20 23:27:46 INFO  Shut down connection with build server.[0m
+2022.06.20 23:27:46 INFO  Shut down connection with build server.[0m
+2022.06.21 09:44:39 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.06.21 09:44:40 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.06.21 09:44:40 INFO  Started: Metals version 0.11.6 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.06.21 09:44:40 INFO  time: initialize in 0.61s[0m
+2022.06.21 09:44:41 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.06.21 09:44:41 INFO  Attempting to connect to the build server...[0m
+2022.06.21 09:44:41 INFO  skipping build import with status 'Installed'[0m
+2022.06.21 09:44:44 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.21 09:44:44 INFO  Attempting to connect to the build server...[0m
+2022.06.21 09:44:44 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/project/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.21 09:44:44 INFO  time: Connected to build server in 3.49s[0m
+2022.06.21 09:44:44 INFO  Connected to Build server: Bloop v1.5.0-18-003e6c7b[0m
+2022.06.21 09:44:44 INFO  time: Imported build in 0.12s[0m
+2022.06.21 09:44:48 INFO  time: indexed workspace in 2.98s[0m
+java.util.concurrent.RejectedExecutionException: Task Future(<not completed>) rejected from java.util.concurrent.ThreadPoolExecutor@e5b0f88[Shutting down, pool size = 4, active threads = 4, queued tasks = 0, completed tasks = 158]
+	at java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:2063)
+	at java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:830)
+	at java.util.concurrent.ThreadPoolExecutor.execute(ThreadPoolExecutor.java:1379)
+	at scala.concurrent.impl.ExecutionContextImpl.execute(ExecutionContextImpl.scala:21)
+	at scala.concurrent.impl.Promise$Transformation.submitWithValue(Promise.scala:429)
+	at scala.concurrent.impl.Promise$DefaultPromise.submitWithValue(Promise.scala:338)
+	at scala.concurrent.impl.Promise$DefaultPromise.tryComplete0(Promise.scala:285)
+	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:504)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+java.util.concurrent.RejectedExecutionException: Task Future(<not completed>) rejected from java.util.concurrent.ThreadPoolExecutor@e5b0f88[Shutting down, pool size = 4, active threads = 4, queued tasks = 0, completed tasks = 158]
+	at java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:2063)
+	at java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:830)
+	at java.util.concurrent.ThreadPoolExecutor.execute(ThreadPoolExecutor.java:1379)
+	at scala.concurrent.impl.ExecutionContextImpl.execute(ExecutionContextImpl.scala:21)
+	at scala.concurrent.impl.Promise$Transformation.submitWithValue(Promise.scala:429)
+	at scala.concurrent.impl.Promise$DefaultPromise.submitWithValue(Promise.scala:338)
+	at scala.concurrent.impl.Promise$DefaultPromise.tryComplete0(Promise.scala:285)
+	at scala.concurrent.impl.Promise$Transformation.handleFailure(Promise.scala:444)
+	at scala.concurrent.impl.Promise$Transformation.submitWithValue(Promise.scala:435)
+	at scala.concurrent.impl.Promise$DefaultPromise.submitWithValue(Promise.scala:338)
+	at scala.concurrent.impl.Promise$DefaultPromise.tryComplete0(Promise.scala:285)
+	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:504)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+2022.06.23 21:06:10 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/lsp.trace.json or /home/lyc/.cache/metals/lsp.trace.json[0m
+2022.06.23 21:06:11 INFO  logging to file /mnt/data/projects/npu/EasyNPU/.metals/metals.log[0m
+2022.06.23 21:06:11 INFO  Started: Metals version 0.11.6 in workspace '/mnt/data/projects/npu/EasyNPU' for client code-server 1.63.0.[0m
+2022.06.23 21:06:12 INFO  time: initialize in 0.92s[0m
+2022.06.23 21:06:12 WARN  Flyway upgrade recommended: H2 2.1.212 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.1.210.[0m
+2022.06.23 21:06:13 INFO  Attempting to connect to the build server...[0m
+2022.06.23 21:06:13 INFO  skipping build import with status 'Installed'[0m
+2022.06.23 21:06:16 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.23 21:06:16 INFO  Attempting to connect to the build server...[0m
+2022.06.23 21:06:16 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /mnt/data/projects/npu/EasyNPU/project/.metals/bsp.trace.json or /home/lyc/.cache/metals/bsp.trace.json[0m
+2022.06.23 21:06:16 INFO  time: Connected to build server in 3.17s[0m
+2022.06.23 21:06:16 INFO  Connected to Build server: Bloop v1.5.0-18-003e6c7b[0m
+2022.06.23 21:06:18 INFO  no build target found for /mnt/data/projects/npu/EasyNPU/src/main/scala/weight_scheduler.scala. Using presentation compiler with project's scala-library version: 3.1.2[0m
+2022.06.23 21:06:18 INFO  time: code lens generation in 4.99s[0m
+2022.06.23 21:06:19 INFO  time: Imported build in 0.13s[0m
+2022.06.23 21:06:21 INFO  time: indexed workspace in 2.33s[0m
+2022.06.23 21:45:34 INFO  compiling easynpu (1 scala source)[0m
+2022.06.23 21:45:38 INFO  time: compiled easynpu in 4.55s[0m
+2022.06.23 21:57:15 INFO  compiling easynpu (1 scala source)[0m
+2022.06.23 21:57:15 WARN  Could not load snapshot text for /mnt/data/projects/npu/EasyNPU/src/main/scala/weight_scheduler.scala[0m
+2022.06.23 21:57:17 INFO  time: compiled easynpu in 1.96s[0m
+2022.06.23 21:59:49 INFO  compiling easynpu (1 scala source)[0m
+2022.06.23 21:59:50 INFO  time: compiled easynpu in 1.76s[0m
+2022.06.23 23:17:51 INFO  shutting down Metals[0m
+2022.06.23 23:17:51 INFO  Shut down connection with build server.[0m
+2022.06.23 23:17:51 INFO  Shut down connection with build server.[0m

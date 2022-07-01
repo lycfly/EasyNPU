@@ -442,7 +442,7 @@ PRE_FETCH --> IDLE: layer_end
 
 ```
 
-+ 当PE还在计算完一个subconv而Weight schedule处于LOAD_BS状态时，subconv应该暂停，否则可能在load bias途中错过prefetch的时机。
++ 当PE计算完一个subconv而Weight schedule处于LOAD_BS状态时，subconv应该暂停，否则可能在load bias途中错过prefetch的时机。
 
 
 

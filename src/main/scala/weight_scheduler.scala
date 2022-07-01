@@ -21,7 +21,7 @@ class weight_scheduler (cfg: NPUConfig) extends Component{
     val prefetch_one = in Bool()
     //val oz_cnt = in UInt(cfg.CHANNEL_WD bits)
     
-   // val wdtcm_rbus = slave(DTCM_rbus(cfg.WDTCM_ADDRWD, cfg.WDTCM_WD))
+    val wdtcm_rbus = slave(DTCM_rbus(cfg.WDTCM_ADDRWD, cfg.WDTCM_WD))
    // val wescp_wbus = master(RF_wbus(cfg.WESCP_ADDRWD, cfg.WESCP_BUS_WD))
     val wescp_ctrl = slave(Wescp_ctrl_bus(cfg))
     val rg_para = slave(Para_reg_interface(cfg))
@@ -56,6 +56,7 @@ class weight_scheduler (cfg: NPUConfig) extends Component{
   subconv_end := kz.io.this_ov
   oz_inc_flag := kz.io.this_ov & ~(oz.io.nxt_cnt === (io.rg_para.Co + 1).resize(cfg.CHANNEL_WD+1)) 
   layer_end := oz.io.this_ov
+
   // bias scale load cnt
   val BS_CNT_WD = log2Up(cfg.BIAS_BYTE_NUM + 1) + cfg.SUBOCH_WD 
   val bs_cnt_th = UInt(BS_CNT_WD bits)
@@ -115,7 +116,7 @@ class weight_scheduler (cfg: NPUConfig) extends Component{
           when(subconv_end & oz_inc_flag){
             goto(LOAD_BS)  
           }.elsewhen(subconv_end & layer_end){
-            goto(LOAD_BS)  
+            goto(IDLE)  
           }
       }
   }
