@@ -1,0 +1,49 @@
+# 排除所有.开头的隐藏文件:
+.*
+.*/*
+*.class
+*.log
+*.bak
+
+# sbt specific
+.cache/
+.history/
+dist/*
+target
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+
+.idea
+out
+
+# Eclipse
+bin/
+.classpath
+.project
+.settings
+.cache-main
+
+#User
+*.vhd
+*.v
+*.cf
+*.json
+*.vcd
+*.bin
+
+/simWorkspace
+/tmp/
+/synthWorkspace/*
+/elaboWorkspace/*
+/lib/numsca_2.12-0.1.5.jar
+
+/quartusWorkspace
+
+
+!.gitignore
