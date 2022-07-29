@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.7.0    git head : eca519e78d4e6022e34911ec300a432ed9db8220
 // Component : pe_unit
-// Git hash  : f1f795b65a2a20dfc7920bbbc2342e1f6ac30d62
+// Git hash  : a8067f8b21100dedc7f8f4dc50eeab43e42ffc01
 
 `timescale 1ns/1ps
 
@@ -12,7 +12,7 @@ module pe_unit (
   input               pe_bias_in_valid,
   input      [31:0]   pe_bias_in_payload,
   input               pe_shift_scale_valid,
-  input      [4:0]    pe_shift_scale_payload,
+  input      [7:0]    pe_shift_scale_payload,
   output              pe_ofmap_out_valid,
   output     [7:0]    pe_ofmap_out_payload,
   input               pe_ctrl_ps_back_en,
@@ -85,7 +85,7 @@ module pe_unit (
   QNT_unit qnt (
     .enable      (pe_ctrl_ps_scale_en        ), //i
     .indata      (adder_out_payload[31:0]    ), //i
-    .shift_scale (pe_shift_scale_payload[4:0]), //i
+    .shift_scale (pe_shift_scale_payload[7:0]), //i
     .quant_data  (qnt_quant_data[31:0]       )  //o
   );
   Ram1r1w Ps_rgfile (
@@ -171,40 +171,40 @@ endmodule
 module QNT_unit (
   input               enable,
   input      [31:0]   indata,
-  input      [4:0]    shift_scale,
+  input      [7:0]    shift_scale,
   output     [31:0]   quant_data
 );
 
   wire       [31:0]   roundtoinf_indata;
-  wire       [4:0]    roundtoinf_roundbits;
+  wire       [7:0]    roundtoinf_roundbits;
   wire       [31:0]   roundtoinf_outdata;
-  wire       [4:0]    tmp_scale_abs;
-  wire       [4:0]    tmp_scale_abs_1;
-  wire       [4:0]    tmp_scale_abs_2;
+  wire       [7:0]    tmp_scale_abs;
+  wire       [7:0]    tmp_scale_abs_1;
+  wire       [7:0]    tmp_scale_abs_2;
   wire       [0:0]    tmp_scale_abs_3;
   wire       [31:0]   tmp_indata_after_shift;
   wire       [31:0]   tmp_indata_after_round;
   wire                isSign;
-  wire       [4:0]    scale_abs;
+  wire       [7:0]    scale_abs;
   wire       [31:0]   indata_after_shift;
   wire       [31:0]   indata_after_round;
 
-  assign tmp_scale_abs = (shift_scale[4] ? tmp_scale_abs_1 : shift_scale);
+  assign tmp_scale_abs = (shift_scale[7] ? tmp_scale_abs_1 : shift_scale);
   assign tmp_scale_abs_1 = (~ shift_scale);
-  assign tmp_scale_abs_3 = shift_scale[4];
-  assign tmp_scale_abs_2 = {4'd0, tmp_scale_abs_3};
+  assign tmp_scale_abs_3 = shift_scale[7];
+  assign tmp_scale_abs_2 = {7'd0, tmp_scale_abs_3};
   assign tmp_indata_after_shift = ($signed(indata) <<< scale_abs);
   assign tmp_indata_after_round = roundtoinf_outdata;
   RoundToInf_unit roundtoinf (
     .indata    (roundtoinf_indata[31:0]  ), //i
-    .roundbits (roundtoinf_roundbits[4:0]), //i
+    .roundbits (roundtoinf_roundbits[7:0]), //i
     .outdata   (roundtoinf_outdata[31:0] )  //o
   );
-  assign isSign = shift_scale[4];
+  assign isSign = shift_scale[7];
   assign scale_abs = (tmp_scale_abs + tmp_scale_abs_2);
   assign indata_after_shift = (isSign ? indata : tmp_indata_after_shift);
   assign roundtoinf_indata = indata_after_shift;
-  assign roundtoinf_roundbits = (isSign ? scale_abs : 5'h0);
+  assign roundtoinf_roundbits = (isSign ? scale_abs : 8'h0);
   assign indata_after_round = (enable ? tmp_indata_after_round : indata);
   assign quant_data = indata_after_round;
 
@@ -305,7 +305,7 @@ endmodule
 
 module RoundToInf_unit (
   input      [31:0]   indata,
-  input      [4:0]    roundbits,
+  input      [7:0]    roundbits,
   output     [31:0]   outdata
 );
 
@@ -314,15 +314,17 @@ module RoundToInf_unit (
   wire       [31:0]   tmp_outdata_1;
   wire       [31:0]   tmp_outdata_2;
   wire       [31:0]   tmp_outdata_3;
+  wire       [4:0]    roundbit;
   wire                isZero;
   wire       [31:0]   decide_bit;
 
-  assign tmp_decide_bit = (roundbits - 5'h01);
+  assign tmp_decide_bit = (roundbit - 5'h01);
   assign tmp_outdata = ($signed(tmp_outdata_1) + $signed(tmp_outdata_3));
-  assign tmp_outdata_1 = ($signed(tmp_outdata_2) >>> roundbits);
+  assign tmp_outdata_1 = ($signed(tmp_outdata_2) >>> roundbit);
   assign tmp_outdata_2 = indata;
   assign tmp_outdata_3 = decide_bit;
-  assign isZero = (roundbits == 5'h0);
+  assign roundbit = roundbits[4:0];
+  assign isZero = (roundbits == 8'h0);
   assign decide_bit = {31'h0,indata[tmp_decide_bit]};
   assign outdata = (isZero ? indata : tmp_outdata);
 

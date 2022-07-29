@@ -61,21 +61,23 @@ class adder_unit (cfg: NPUConfig) extends Component {
   io.result :=  Mux(io.maxpool_en, comp_res, adder_sum)
 }
 
-class RoundToInf_unit (DATAWD: Int, SIGNED: Boolean) extends Component {
-  val RND_WD = log2Up(DATAWD)
+class RoundToInf_unit (DATAWD: Int, ROUNDWD: Int,  SIGNED: Boolean) extends Component {
   val io = new Bundle {
    val indata = in Bits(DATAWD bits)
-   val roundbits = in UInt(RND_WD bits)
+   val roundbits = in UInt(ROUNDWD bits)
    val outdata = out  Bits(DATAWD bits)
   }
   noIoPrefix()
+  val RND_WD = log2Up(DATAWD-1)
+  val roundbit = UInt(RND_WD bits)
+  roundbit := io.roundbits.resized
   val isZero = io.roundbits === 0
-  val decide_bit = B(0,DATAWD-1 bits) ## io.indata(io.roundbits-1)
+  val decide_bit = B(0,DATAWD-1 bits) ## io.indata(roundbit-1)
   if(SIGNED){
-    io.outdata := Mux(isZero, io.indata, ((io.indata.asSInt >> io.roundbits) + decide_bit.asSInt).asBits)
+    io.outdata := Mux(isZero, io.indata, ((io.indata.asSInt >> roundbit) + decide_bit.asSInt).asBits)
   }
   else{
-    io.outdata := Mux(isZero, io.indata, ((io.indata.asUInt >> io.roundbits) + decide_bit.asUInt).asBits)
+    io.outdata := Mux(isZero, io.indata, ((io.indata.asUInt >> roundbit) + decide_bit.asUInt).asBits)
   }
 }
 
@@ -93,7 +95,7 @@ class QNT_unit (DIn_WD: Int, DOut_WD: Int, DSc_WD: Int) extends Component {
   val indata_after_round = SInt(DIn_WD bits)
   indata_after_shift := Mux(isSign, io.indata, io.indata |<< scale_abs)
 
-  val roundtoinf = new RoundToInf_unit(DATAWD = DIn_WD, SIGNED= true)
+  val roundtoinf = new RoundToInf_unit(DATAWD = DIn_WD, ROUNDWD =DSc_WD, SIGNED= true)
   roundtoinf.io.indata := indata_after_shift.asBits
   roundtoinf.io.roundbits := Mux(isSign, scale_abs, U(0))
   indata_after_round := Mux(io.enable, roundtoinf.io.outdata.asSInt, io.indata)
@@ -188,7 +190,7 @@ class pe_unit (cfg: NPUConfig) extends Component {
 
 }
 
-
+ 
 object pe_gen {
   def main(args: Array[String]): Unit = {
     SpinalConfig(
