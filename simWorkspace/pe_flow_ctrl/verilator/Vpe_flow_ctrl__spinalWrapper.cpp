@@ -7,7 +7,7 @@
 
 #include "Vpe_flow_ctrl.h"
 #ifdef TRACE
-#include "verilated_vcd_c.h"
+#include "verilated_fst_c.h"
 #endif
 #include "Vpe_flow_ctrl__Syms.h"
 
@@ -159,9 +159,9 @@ public:
     uint32_t timeCheck;
     bool waveEnabled;
     Vpe_flow_ctrl top;
-    ISignalAccess *signalAccess[54];
+    ISignalAccess *signalAccess[55];
     #ifdef TRACE
-	  VerilatedVcdC tfp;
+	  VerilatedFstC tfp;
 	  #endif
     string name;
 
@@ -176,66 +176,67 @@ public:
       signalAccess[2] = new CDataSignalAccess( top.rg_para_xhat );
       signalAccess[3] = new CDataSignalAccess( top.rg_para_y );
       signalAccess[4] = new CDataSignalAccess( top.rg_para_x );
-      signalAccess[5] = new CDataSignalAccess( top.rg_para_Hk );
-      signalAccess[6] = new CDataSignalAccess( top.rg_para_Wk );
-      signalAccess[7] = new CDataSignalAccess( top.rg_para_Ho );
-      signalAccess[8] = new CDataSignalAccess( top.rg_para_Wo );
-      signalAccess[9] = new CDataSignalAccess( top.rg_para_Hi );
-      signalAccess[10] = new CDataSignalAccess( top.rg_para_Wi );
-      signalAccess[11] = new CDataSignalAccess( top.rg_para_Co );
-      signalAccess[12] = new CDataSignalAccess( top.rg_para_Ci );
-      signalAccess[13] = new CDataSignalAccess( top.rg_para_sh );
-      signalAccess[14] = new CDataSignalAccess( top.rg_para_sw );
-      signalAccess[15] = new CDataSignalAccess( top.rg_para_ph );
-      signalAccess[16] = new CDataSignalAccess( top.rg_para_pw );
-      signalAccess[17] = new CDataSignalAccess( top.rg_para_dh );
-      signalAccess[18] = new CDataSignalAccess( top.rg_para_dw );
-      signalAccess[19] = new CDataSignalAccess( top.rg_para_zs );
-      signalAccess[20] = new CDataSignalAccess( top.rg_para_zp );
-      signalAccess[21] = new CDataSignalAccess( top.rg_para_k );
-      signalAccess[22] = new CDataSignalAccess( top.rg_para_shxhat );
-      signalAccess[23] = new CDataSignalAccess( top.rg_para_xyzs );
-      signalAccess[24] = new CDataSignalAccess( top.rg_ctrl_bias_en );
-      signalAccess[25] = new CDataSignalAccess( top.rg_ctrl_scale_en );
-      signalAccess[26] = new CDataSignalAccess( top.rg_ctrl_tensor_op_en );
-      signalAccess[27] = new CDataSignalAccess( top.pe_ctrl_ps_back_en );
-      signalAccess[28] = new CDataSignalAccess( top.pe_ctrl_ps_waddr );
-      signalAccess[29] = new CDataSignalAccess( top.pe_ctrl_ps_raddr );
-      signalAccess[30] = new CDataSignalAccess( top.pe_ctrl_ps_wr );
-      signalAccess[31] = new CDataSignalAccess( top.pe_ctrl_ps_rd );
-      signalAccess[32] = new CDataSignalAccess( top.pe_ctrl_ps_allow_rd );
-      signalAccess[33] = new CDataSignalAccess( top.pe_ctrl_ps_pinA_bias_en );
-      signalAccess[34] = new CDataSignalAccess( top.pe_ctrl_ps_pinB_bias_en );
-      signalAccess[35] = new CDataSignalAccess( top.pe_ctrl_byp_mul_en );
-      signalAccess[36] = new CDataSignalAccess( top.pe_ctrl_maxpool_en );
-      signalAccess[37] = new CDataSignalAccess( top.pe_ctrl_bias_mul_en );
-      signalAccess[38] = new CDataSignalAccess( top.pe_ctrl_ps_scale_en );
-      signalAccess[39] = new CDataSignalAccess( top.ifscp_ctrl_if_rd );
-      signalAccess[40] = new CDataSignalAccess( top.ifscp_ctrl_hw_addr );
-      signalAccess[41] = new CDataSignalAccess( top.ifscp_ctrl_ich_addr );
-      signalAccess[42] = new CDataSignalAccess( top.ifscp_ctrl_cast_mode );
-      signalAccess[43] = new CDataSignalAccess( top.wescp_ctrl_we_rd );
-      signalAccess[44] = new CDataSignalAccess( top.wescp_ctrl_bs_wr );
-      signalAccess[45] = new CDataSignalAccess( top.wescp_ctrl_bs_rd );
-      signalAccess[46] = new CDataSignalAccess( top.wescp_ctrl_sc_rd );
-      signalAccess[47] = new CDataSignalAccess( top.wescp_ctrl_bs_byte_cnt );
-      signalAccess[48] = new CDataSignalAccess( top.wescp_ctrl_och_gcnt );
-      signalAccess[49] = new CDataSignalAccess( top.pe_flags_ps_rd_ready );
-      signalAccess[50] = new CDataSignalAccess( top.pe_flags_ps_wr_ready );
-      signalAccess[51] = new CDataSignalAccess( top.subconv_finish );
-      signalAccess[52] = new CDataSignalAccess( top.clk );
-      signalAccess[53] = new CDataSignalAccess( top.reset );
+      signalAccess[5] = new CDataSignalAccess( top.rg_para_z );
+      signalAccess[6] = new CDataSignalAccess( top.rg_para_Hk );
+      signalAccess[7] = new CDataSignalAccess( top.rg_para_Wk );
+      signalAccess[8] = new CDataSignalAccess( top.rg_para_Ho );
+      signalAccess[9] = new CDataSignalAccess( top.rg_para_Wo );
+      signalAccess[10] = new CDataSignalAccess( top.rg_para_Hi );
+      signalAccess[11] = new CDataSignalAccess( top.rg_para_Wi );
+      signalAccess[12] = new CDataSignalAccess( top.rg_para_Co );
+      signalAccess[13] = new CDataSignalAccess( top.rg_para_Ci );
+      signalAccess[14] = new CDataSignalAccess( top.rg_para_sh );
+      signalAccess[15] = new CDataSignalAccess( top.rg_para_sw );
+      signalAccess[16] = new CDataSignalAccess( top.rg_para_ph );
+      signalAccess[17] = new CDataSignalAccess( top.rg_para_pw );
+      signalAccess[18] = new CDataSignalAccess( top.rg_para_dh );
+      signalAccess[19] = new CDataSignalAccess( top.rg_para_dw );
+      signalAccess[20] = new CDataSignalAccess( top.rg_para_zs );
+      signalAccess[21] = new CDataSignalAccess( top.rg_para_zp );
+      signalAccess[22] = new CDataSignalAccess( top.rg_para_k );
+      signalAccess[23] = new CDataSignalAccess( top.rg_para_shxhat );
+      signalAccess[24] = new CDataSignalAccess( top.rg_para_xyzs );
+      signalAccess[25] = new CDataSignalAccess( top.rg_ctrl_bias_en );
+      signalAccess[26] = new CDataSignalAccess( top.rg_ctrl_scale_en );
+      signalAccess[27] = new CDataSignalAccess( top.rg_ctrl_tensor_op_en );
+      signalAccess[28] = new CDataSignalAccess( top.pe_ctrl_ps_back_en );
+      signalAccess[29] = new CDataSignalAccess( top.pe_ctrl_ps_waddr );
+      signalAccess[30] = new CDataSignalAccess( top.pe_ctrl_ps_raddr );
+      signalAccess[31] = new CDataSignalAccess( top.pe_ctrl_ps_wr );
+      signalAccess[32] = new CDataSignalAccess( top.pe_ctrl_ps_rd );
+      signalAccess[33] = new CDataSignalAccess( top.pe_ctrl_ps_allow_rd );
+      signalAccess[34] = new CDataSignalAccess( top.pe_ctrl_ps_pinA_bias_en );
+      signalAccess[35] = new CDataSignalAccess( top.pe_ctrl_ps_pinB_bias_en );
+      signalAccess[36] = new CDataSignalAccess( top.pe_ctrl_byp_mul_en );
+      signalAccess[37] = new CDataSignalAccess( top.pe_ctrl_maxpool_en );
+      signalAccess[38] = new CDataSignalAccess( top.pe_ctrl_bias_mul_en );
+      signalAccess[39] = new CDataSignalAccess( top.pe_ctrl_ps_scale_en );
+      signalAccess[40] = new CDataSignalAccess( top.ifscp_ctrl_if_rd );
+      signalAccess[41] = new CDataSignalAccess( top.ifscp_ctrl_hw_addr );
+      signalAccess[42] = new CDataSignalAccess( top.ifscp_ctrl_ich_addr );
+      signalAccess[43] = new CDataSignalAccess( top.ifscp_ctrl_cast_mode );
+      signalAccess[44] = new CDataSignalAccess( top.wescp_ctrl_we_rd );
+      signalAccess[45] = new CDataSignalAccess( top.wescp_ctrl_bs_wr );
+      signalAccess[46] = new CDataSignalAccess( top.wescp_ctrl_bs_rd );
+      signalAccess[47] = new CDataSignalAccess( top.wescp_ctrl_sc_rd );
+      signalAccess[48] = new CDataSignalAccess( top.wescp_ctrl_bs_byte_cnt );
+      signalAccess[49] = new CDataSignalAccess( top.wescp_ctrl_och_gcnt );
+      signalAccess[50] = new CDataSignalAccess( top.pe_flags_ps_rd_ready );
+      signalAccess[51] = new CDataSignalAccess( top.pe_flags_ps_wr_ready );
+      signalAccess[52] = new CDataSignalAccess( top.subconv_finish );
+      signalAccess[53] = new CDataSignalAccess( top.clk );
+      signalAccess[54] = new CDataSignalAccess( top.reset );
 
       #ifdef TRACE
       Verilated::traceEverOn(true);
       top.trace(&tfp, 99);
-      tfp.open((std::string("/mnt/data/projects/npu/EasyNPU/./simWorkspace/pe_flow_ctrl/") + name + ".vcd").c_str());
+      tfp.open((std::string("/home/lyc/project/EasyNPU/./simWorkspace/pe_flow_ctrl/") + name + ".fst").c_str());
       #endif
       this->name = name;
     }
 
     virtual ~Wrapper_1(){
-      for(int idx = 0;idx < 54;idx++){
+      for(int idx = 0;idx < 55;idx++){
           delete signalAccess[idx];
       }
 
@@ -244,7 +245,7 @@ public:
       tfp.close();
       #endif
       #ifdef COVERAGE
-      VerilatedCov::write((("/mnt/data/projects/npu/EasyNPU/./simWorkspace/pe_flow_ctrl/") + name + ".dat").c_str());
+      VerilatedCov::write((("/home/lyc/project/EasyNPU/./simWorkspace/pe_flow_ctrl/") + name + ".dat").c_str());
       #endif
     }
 

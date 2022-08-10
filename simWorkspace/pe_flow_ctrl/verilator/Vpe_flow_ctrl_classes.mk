@@ -16,7 +16,7 @@ VM_THREADS = 0
 # Tracing output mode?  0/1 (from --trace/--trace-fst)
 VM_TRACE = 1
 # Tracing output mode in FST format?  0/1 (from --trace-fst)
-VM_TRACE_FST = 0
+VM_TRACE_FST = 1
 # Tracing threaded output mode?  0/1/N threads (from --trace-thread)
 VM_TRACE_THREADS = 0
 # Separate FST writer thread? 0/1 (from --trace-fst with --trace-thread > 0)
@@ -26,24 +26,26 @@ VM_TRACE_FST_WRITER_THREAD = 0
 # Generated module classes, fast-path, compile with highest optimization
 VM_CLASSES_FAST += \
 	Vpe_flow_ctrl \
+	Vpe_flow_ctrl___024root__DepSet_h995ee1f8__0 \
 
 # Generated module classes, non-fast-path, compile with low/medium optimization
 VM_CLASSES_SLOW += \
-	Vpe_flow_ctrl__Slow \
+	Vpe_flow_ctrl___024root__Slow \
+	Vpe_flow_ctrl___024root__DepSet_h995ee1f8__0__Slow \
 
 # Generated support classes, fast-path, compile with highest optimization
 VM_SUPPORT_FAST += \
-	Vpe_flow_ctrl__Trace \
+	Vpe_flow_ctrl__Trace__0 \
 
 # Generated support classes, non-fast-path, compile with low/medium optimization
 VM_SUPPORT_SLOW += \
 	Vpe_flow_ctrl__Syms \
-	Vpe_flow_ctrl__Trace__Slow \
+	Vpe_flow_ctrl__Trace__0__Slow \
 
 # Global classes, need linked once per executable, fast-path, compile with highest optimization
 VM_GLOBAL_FAST += \
 	verilated \
-	verilated_vcd_c \
+	verilated_fst_c \
 
 # Global classes, need linked once per executable, non-fast-path, compile with low/medium optimization
 VM_GLOBAL_SLOW += \

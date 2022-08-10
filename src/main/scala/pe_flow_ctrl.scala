@@ -81,10 +81,10 @@ class pe_flow_ctrl (cfg: NPUConfig) extends Component{
   val kzi = counter.build(cfg.SUBICH_WD   ,false, io.rg_para.k,    1 , kzi_sigs)
   val hki = counter.build(cfg.KERNEL_H_WD ,false, io.rg_para.Hk,   1 , hki_sigs)
   val wki = counter.build(cfg.KERNEL_W_WD ,false, io.rg_para.Wk,   1 , wki_sigs)
-  val ozi = counter.build(cfg.SUBOCH_WD   ,false, io.rg_para.zs,   1 , ozi_sigs)
   val oyi = counter.build(cfg.SUBH_WD     ,false, io.rg_para.yhat, 1 , oyi_sigs)
   val oxi = counter.build(cfg.SUBW_WD     ,false, io.rg_para.xhat, 1 , oxi_sigs)
-  
+  val ozi = counter.build(cfg.SUBOCH_WD   ,false, io.rg_para.zs,   1 , ozi_sigs)
+
   val pe_ctrl_rgs = PortToRegWithInit(new PeControls(cfg)) 
   io.pe_ctrl <> pe_ctrl_rgs
   val ifscp_ctrl_rgs = PortToRegWithInit(new Ifscp_ctrl_bus(cfg)) 
@@ -206,7 +206,7 @@ object flow_ctrl_gen {
 object flow_ctrl_simple_sym{
   def main(args: Array[String]): Unit = {
 
-    val compiled = SimConfig.withWave.allOptimisation.compile(
+    val compiled = SimConfig.withFstWave.allOptimisation.compile(
       rtl = new pe_flow_ctrl(cfg=NPUConfig()))
     compiled.doSim { dut =>
       dut.clockDomain.forkStimulus(2)

@@ -17,6 +17,8 @@ SYSTEMC_INCLUDE ?=
 SYSTEMC_LIBDIR ?= 
 
 ### Switches...
+# C++ code coverage  0/1 (from --prof-c)
+VM_PROFC = 0
 # SystemC output mode?  0/1 (from --sc)
 VM_SC = 0
 # Legacy or SystemC output mode?  0/1 (from --sc)
@@ -52,6 +54,7 @@ VM_USER_LDLIBS = \
 	-Wno-attributes \
 	-fvisibility=hidden \
 	-std=c++11 \
+	-lz \
 
 # User .cpp files (from .cpp's on Verilator command line)
 VM_USER_CLASSES = \

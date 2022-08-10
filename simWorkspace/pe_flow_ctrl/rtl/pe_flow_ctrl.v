@@ -1,6 +1,6 @@
-// Generator : SpinalHDL v1.7.0    git head : eca519e78d4e6022e34911ec300a432ed9db8220
+// Generator : SpinalHDL v1.7.1    git head : 0444bb76ab1d6e19f0ec46bc03c4769776deb7d5
 // Component : pe_flow_ctrl
-// Git hash  : 4cf7f97c71a2bf6b231eea3b8cc7534ce901135c
+// Git hash  : 598278383b4999ed4d26d5a8ecd7912b879da931
 
 `timescale 1ns/1ps
 
@@ -10,6 +10,7 @@ module pe_flow_ctrl (
   input      [5:0]    rg_para_xhat,
   input      [5:0]    rg_para_y,
   input      [5:0]    rg_para_x,
+  input      [7:0]    rg_para_z,
   input      [7:0]    rg_para_Hk,
   input      [7:0]    rg_para_Wk,
   input      [7:0]    rg_para_Ho,
@@ -64,52 +65,74 @@ module pe_flow_ctrl (
   localparam fsm_enumDef_SUBCONV = 2'd1;
   localparam fsm_enumDef_TENSOR_OP = 2'd2;
 
-  wire       [7:0]    kz_step;
+  wire       [8:0]    kz_step;
   wire       [7:0]    kz_cnt;
+  wire       [8:0]    kz_nxt_cnt;
   wire                kz_this_ov;
   wire                kz_reach_th;
+  wire                kz_isInitial;
   wire       [3:0]    kzi_cnt;
+  wire       [4:0]    kzi_nxt_cnt;
   wire                kzi_this_ov;
   wire                kzi_reach_th;
+  wire                kzi_isInitial;
   wire       [7:0]    hki_cnt;
+  wire       [8:0]    hki_nxt_cnt;
   wire                hki_this_ov;
   wire                hki_reach_th;
+  wire                hki_isInitial;
   wire       [7:0]    wki_cnt;
+  wire       [8:0]    wki_nxt_cnt;
   wire                wki_this_ov;
   wire                wki_reach_th;
-  wire       [3:0]    ozi_cnt;
-  wire                ozi_this_ov;
-  wire                ozi_reach_th;
+  wire                wki_isInitial;
   wire       [5:0]    oyi_cnt;
+  wire       [6:0]    oyi_nxt_cnt;
   wire                oyi_this_ov;
   wire                oyi_reach_th;
+  wire                oyi_isInitial;
   wire       [5:0]    oxi_cnt;
+  wire       [6:0]    oxi_nxt_cnt;
   wire                oxi_this_ov;
   wire                oxi_reach_th;
+  wire                oxi_isInitial;
+  wire       [3:0]    ozi_cnt;
+  wire       [4:0]    ozi_nxt_cnt;
+  wire                ozi_this_ov;
+  wire                ozi_reach_th;
+  wire                ozi_isInitial;
+  wire       [3:0]    _zz_step;
   wire       [5:0]    _zz_ifscp_ctrl_rgs_hw_addr;
   wire       [5:0]    _zz_ifscp_ctrl_rgs_hw_addr_1;
   reg                 dofetch;
   wire                kz_sigs_inc;
   wire                kz_sigs_this_ov;
   wire                kz_sigs_reach_th;
+  wire                kz_sigs_isInitial;
   wire                hki_sigs_inc;
   wire                hki_sigs_this_ov;
   wire                hki_sigs_reach_th;
+  wire                hki_sigs_isInitial;
   wire                wki_sigs_inc;
   wire                wki_sigs_this_ov;
   wire                wki_sigs_reach_th;
+  wire                wki_sigs_isInitial;
   wire                kzi_sigs_inc;
   wire                kzi_sigs_this_ov;
   wire                kzi_sigs_reach_th;
+  wire                kzi_sigs_isInitial;
   wire                ozi_sigs_inc;
   wire                ozi_sigs_this_ov;
   wire                ozi_sigs_reach_th;
+  wire                ozi_sigs_isInitial;
   wire                oyi_sigs_inc;
   wire                oyi_sigs_this_ov;
   wire                oyi_sigs_reach_th;
+  wire                oyi_sigs_isInitial;
   wire                oxi_sigs_inc;
   wire                oxi_sigs_this_ov;
   wire                oxi_sigs_reach_th;
+  wire                oxi_sigs_isInitial;
   reg                 pe_ctrl_rgs_ps_back_en;
   reg        [6:0]    pe_ctrl_rgs_ps_waddr;
   reg        [6:0]    pe_ctrl_rgs_ps_raddr;
@@ -146,77 +169,92 @@ module pe_flow_ctrl (
   `endif
 
 
+  assign _zz_step = (rg_para_k + 4'b0001);
   assign _zz_ifscp_ctrl_rgs_hw_addr = (rg_para_shxhat + 6'h01);
   assign _zz_ifscp_ctrl_rgs_hw_addr_1 = {2'd0, rg_para_sw};
   counter kz (
-    .step      (kz_step[7:0]   ), //i
+    .step      (kz_step[8:0]   ), //i
     .threshold (rg_para_Ci[7:0]), //i
     .inc_en    (kz_sigs_inc    ), //i
     .cnt       (kz_cnt[7:0]    ), //o
+    .nxt_cnt   (kz_nxt_cnt[8:0]), //o
     .this_ov   (kz_this_ov     ), //o
     .reach_th  (kz_reach_th    ), //o
+    .isInitial (kz_isInitial   ), //o
     .clk       (clk            ), //i
     .reset     (reset          )  //i
   );
   counter_1 kzi (
-    .step      (4'b0001       ), //i
-    .threshold (rg_para_k[3:0]), //i
-    .inc_en    (kzi_sigs_inc  ), //i
-    .cnt       (kzi_cnt[3:0]  ), //o
-    .this_ov   (kzi_this_ov   ), //o
-    .reach_th  (kzi_reach_th  ), //o
-    .clk       (clk           ), //i
-    .reset     (reset         )  //i
+    .step      (5'h01           ), //i
+    .threshold (rg_para_k[3:0]  ), //i
+    .inc_en    (kzi_sigs_inc    ), //i
+    .cnt       (kzi_cnt[3:0]    ), //o
+    .nxt_cnt   (kzi_nxt_cnt[4:0]), //o
+    .this_ov   (kzi_this_ov     ), //o
+    .reach_th  (kzi_reach_th    ), //o
+    .isInitial (kzi_isInitial   ), //o
+    .clk       (clk             ), //i
+    .reset     (reset           )  //i
   );
   counter hki (
-    .step      (8'h01          ), //i
-    .threshold (rg_para_Hk[7:0]), //i
-    .inc_en    (hki_sigs_inc   ), //i
-    .cnt       (hki_cnt[7:0]   ), //o
-    .this_ov   (hki_this_ov    ), //o
-    .reach_th  (hki_reach_th   ), //o
-    .clk       (clk            ), //i
-    .reset     (reset          )  //i
+    .step      (9'h001          ), //i
+    .threshold (rg_para_Hk[7:0] ), //i
+    .inc_en    (hki_sigs_inc    ), //i
+    .cnt       (hki_cnt[7:0]    ), //o
+    .nxt_cnt   (hki_nxt_cnt[8:0]), //o
+    .this_ov   (hki_this_ov     ), //o
+    .reach_th  (hki_reach_th    ), //o
+    .isInitial (hki_isInitial   ), //o
+    .clk       (clk             ), //i
+    .reset     (reset           )  //i
   );
   counter wki (
-    .step      (8'h01          ), //i
-    .threshold (rg_para_Wk[7:0]), //i
-    .inc_en    (wki_sigs_inc   ), //i
-    .cnt       (wki_cnt[7:0]   ), //o
-    .this_ov   (wki_this_ov    ), //o
-    .reach_th  (wki_reach_th   ), //o
-    .clk       (clk            ), //i
-    .reset     (reset          )  //i
+    .step      (9'h001          ), //i
+    .threshold (rg_para_Wk[7:0] ), //i
+    .inc_en    (wki_sigs_inc    ), //i
+    .cnt       (wki_cnt[7:0]    ), //o
+    .nxt_cnt   (wki_nxt_cnt[8:0]), //o
+    .this_ov   (wki_this_ov     ), //o
+    .reach_th  (wki_reach_th    ), //o
+    .isInitial (wki_isInitial   ), //o
+    .clk       (clk             ), //i
+    .reset     (reset           )  //i
   );
-  counter_1 ozi (
-    .step      (4'b0001        ), //i
-    .threshold (rg_para_zs[3:0]), //i
-    .inc_en    (ozi_sigs_inc   ), //i
-    .cnt       (ozi_cnt[3:0]   ), //o
-    .this_ov   (ozi_this_ov    ), //o
-    .reach_th  (ozi_reach_th   ), //o
-    .clk       (clk            ), //i
-    .reset     (reset          )  //i
-  );
-  counter_5 oyi (
-    .step      (6'h01            ), //i
+  counter_4 oyi (
+    .step      (7'h01            ), //i
     .threshold (rg_para_yhat[5:0]), //i
     .inc_en    (oyi_sigs_inc     ), //i
     .cnt       (oyi_cnt[5:0]     ), //o
+    .nxt_cnt   (oyi_nxt_cnt[6:0] ), //o
     .this_ov   (oyi_this_ov      ), //o
     .reach_th  (oyi_reach_th     ), //o
+    .isInitial (oyi_isInitial    ), //o
     .clk       (clk              ), //i
     .reset     (reset            )  //i
   );
-  counter_5 oxi (
-    .step      (6'h01            ), //i
+  counter_4 oxi (
+    .step      (7'h01            ), //i
     .threshold (rg_para_xhat[5:0]), //i
     .inc_en    (oxi_sigs_inc     ), //i
     .cnt       (oxi_cnt[5:0]     ), //o
+    .nxt_cnt   (oxi_nxt_cnt[6:0] ), //o
     .this_ov   (oxi_this_ov      ), //o
     .reach_th  (oxi_reach_th     ), //o
+    .isInitial (oxi_isInitial    ), //o
     .clk       (clk              ), //i
     .reset     (reset            )  //i
+  );
+  counter_1 ozi (
+    .step      (5'h01           ), //i
+    .threshold (rg_para_zs[3:0] ), //i
+    .inc_en    (ozi_sigs_inc    ), //i
+    .cnt       (ozi_cnt[3:0]    ), //o
+    .nxt_cnt   (ozi_nxt_cnt[4:0]), //o
+    .this_ov   (ozi_this_ov     ), //o
+    .reach_th  (ozi_reach_th    ), //o
+    .isInitial (ozi_isInitial   ), //o
+    .clk       (clk             ), //i
+    .reset     (reset           )  //i
   );
   `ifndef SYNTHESIS
   always @(*) begin
@@ -244,21 +282,28 @@ module pe_flow_ctrl (
   assign oyi_sigs_inc = oxi_sigs_this_ov;
   assign oxi_sigs_inc = ozi_sigs_this_ov;
   assign ozi_sigs_inc = dofetch;
-  assign kz_step = {4'd0, rg_para_k};
+  assign kz_step = {5'd0, _zz_step};
   assign kz_sigs_this_ov = kz_this_ov;
   assign kz_sigs_reach_th = kz_reach_th;
+  assign kz_sigs_isInitial = kz_isInitial;
   assign kzi_sigs_this_ov = kzi_this_ov;
   assign kzi_sigs_reach_th = kzi_reach_th;
+  assign kzi_sigs_isInitial = kzi_isInitial;
   assign hki_sigs_this_ov = hki_this_ov;
   assign hki_sigs_reach_th = hki_reach_th;
+  assign hki_sigs_isInitial = hki_isInitial;
   assign wki_sigs_this_ov = wki_this_ov;
   assign wki_sigs_reach_th = wki_reach_th;
-  assign ozi_sigs_this_ov = ozi_this_ov;
-  assign ozi_sigs_reach_th = ozi_reach_th;
+  assign wki_sigs_isInitial = wki_isInitial;
   assign oyi_sigs_this_ov = oyi_this_ov;
   assign oyi_sigs_reach_th = oyi_reach_th;
+  assign oyi_sigs_isInitial = oyi_isInitial;
   assign oxi_sigs_this_ov = oxi_this_ov;
   assign oxi_sigs_reach_th = oxi_reach_th;
+  assign oxi_sigs_isInitial = oxi_isInitial;
+  assign ozi_sigs_this_ov = ozi_this_ov;
+  assign ozi_sigs_reach_th = ozi_reach_th;
+  assign ozi_sigs_isInitial = ozi_isInitial;
   assign pe_ctrl_ps_back_en = pe_ctrl_rgs_ps_back_en;
   assign pe_ctrl_ps_waddr = pe_ctrl_rgs_ps_waddr;
   assign pe_ctrl_ps_raddr = pe_ctrl_rgs_ps_raddr;
@@ -424,33 +469,43 @@ module pe_flow_ctrl (
 
 endmodule
 
-//counter_5 replaced by counter_5
+//counter_1 replaced by counter_1
 
-module counter_5 (
-  input      [5:0]    step,
+//counter_4 replaced by counter_4
+
+module counter_4 (
+  input      [6:0]    step,
   input      [5:0]    threshold,
   input               inc_en,
   output     [5:0]    cnt,
+  output     [6:0]    nxt_cnt,
   output              this_ov,
   output              reach_th,
+  output              isInitial,
   input               clk,
   input               reset
 );
 
-  reg        [5:0]    cnt_rg;
+  wire       [6:0]    _zz_reach_th;
+  reg        [6:0]    cnt_rg;
+  wire       [5:0]    true_threshold;
 
-  assign reach_th = (cnt_rg == threshold);
-  assign cnt = cnt_rg;
+  assign _zz_reach_th = {1'd0, true_threshold};
+  assign true_threshold = threshold;
+  assign nxt_cnt = (cnt_rg + step);
+  assign reach_th = (_zz_reach_th <= nxt_cnt);
+  assign cnt = cnt_rg[5:0];
   assign this_ov = (reach_th && inc_en);
+  assign isInitial = (cnt[5 : 0] == 6'h0);
   always @(posedge clk or posedge reset) begin
     if(reset) begin
-      cnt_rg <= 6'h0;
+      cnt_rg <= 7'h0;
     end else begin
       if(inc_en) begin
         if(reach_th) begin
-          cnt_rg <= 6'h0;
+          cnt_rg <= 7'h0;
         end else begin
-          cnt_rg <= (cnt_rg + step);
+          cnt_rg <= nxt_cnt;
         end
       end
     end
@@ -459,37 +514,43 @@ module counter_5 (
 
 endmodule
 
-//counter_1 replaced by counter_1
-
 //counter replaced by counter
 
 //counter replaced by counter
 
 module counter_1 (
-  input      [3:0]    step,
+  input      [4:0]    step,
   input      [3:0]    threshold,
   input               inc_en,
   output     [3:0]    cnt,
+  output     [4:0]    nxt_cnt,
   output              this_ov,
   output              reach_th,
+  output              isInitial,
   input               clk,
   input               reset
 );
 
-  reg        [3:0]    cnt_rg;
+  wire       [4:0]    _zz_reach_th;
+  reg        [4:0]    cnt_rg;
+  wire       [3:0]    true_threshold;
 
-  assign reach_th = (cnt_rg == threshold);
-  assign cnt = cnt_rg;
+  assign _zz_reach_th = {1'd0, true_threshold};
+  assign true_threshold = threshold;
+  assign nxt_cnt = (cnt_rg + step);
+  assign reach_th = (_zz_reach_th <= nxt_cnt);
+  assign cnt = cnt_rg[3:0];
   assign this_ov = (reach_th && inc_en);
+  assign isInitial = (cnt[3 : 0] == 4'b0000);
   always @(posedge clk or posedge reset) begin
     if(reset) begin
-      cnt_rg <= 4'b0000;
+      cnt_rg <= 5'h0;
     end else begin
       if(inc_en) begin
         if(reach_th) begin
-          cnt_rg <= 4'b0000;
+          cnt_rg <= 5'h0;
         end else begin
-          cnt_rg <= (cnt_rg + step);
+          cnt_rg <= nxt_cnt;
         end
       end
     end
@@ -499,30 +560,38 @@ module counter_1 (
 endmodule
 
 module counter (
-  input      [7:0]    step,
+  input      [8:0]    step,
   input      [7:0]    threshold,
   input               inc_en,
   output     [7:0]    cnt,
+  output     [8:0]    nxt_cnt,
   output              this_ov,
   output              reach_th,
+  output              isInitial,
   input               clk,
   input               reset
 );
 
-  reg        [7:0]    cnt_rg;
+  wire       [8:0]    _zz_reach_th;
+  reg        [8:0]    cnt_rg;
+  wire       [7:0]    true_threshold;
 
-  assign reach_th = (cnt_rg == threshold);
-  assign cnt = cnt_rg;
+  assign _zz_reach_th = {1'd0, true_threshold};
+  assign true_threshold = threshold;
+  assign nxt_cnt = (cnt_rg + step);
+  assign reach_th = (_zz_reach_th <= nxt_cnt);
+  assign cnt = cnt_rg[7:0];
   assign this_ov = (reach_th && inc_en);
+  assign isInitial = (cnt[7 : 0] == 8'h0);
   always @(posedge clk or posedge reset) begin
     if(reset) begin
-      cnt_rg <= 8'h0;
+      cnt_rg <= 9'h0;
     end else begin
       if(inc_en) begin
         if(reach_th) begin
-          cnt_rg <= 8'h0;
+          cnt_rg <= 9'h0;
         end else begin
-          cnt_rg <= (cnt_rg + step);
+          cnt_rg <= nxt_cnt;
         end
       end
     end
