@@ -260,3 +260,58 @@ object flow_ctrl_simple_sym{
 
   }
 }
+
+
+object flow_ctrl_with_pe_simple_sym{
+  def main(args: Array[String]): Unit = {
+
+    val compiled = SimConfig.withFstWave.allOptimisation.compile(
+      rtl = new pe_flow_ctrl(cfg=NPUConfig()))
+    compiled.doSim { dut =>
+      dut.clockDomain.forkStimulus(2)
+      dut.io.start_conv #= false
+      dut.io.pe_flags.ps_wr_ready #= false
+      dut.io.pe_flags.ps_rd_ready #= false
+
+      dut.io.rg_para.yhat #= 10-1
+      dut.io.rg_para.xhat #= 6-1
+      dut.io.rg_para.y #= 10-1
+      dut.io.rg_para.x #= 6-1
+      dut.io.rg_para.Hk #= 3-1
+      dut.io.rg_para.Wk #= 3-1
+      dut.io.rg_para.Ho #= 40-1
+      dut.io.rg_para.Wo #= 60-1
+      dut.io.rg_para.Hi #= 40-1
+      dut.io.rg_para.Wi #= 60-1
+      dut.io.rg_para.Ci #= 16-1
+      dut.io.rg_para.Co #= 16-1
+      dut.io.rg_para.sh #= 1
+      dut.io.rg_para.sw #= 1
+      dut.io.rg_para.ph #= 1
+      dut.io.rg_para.pw #= 1
+      dut.io.rg_para.dh #= 1
+      dut.io.rg_para.dw #= 1
+      dut.io.rg_para.zs #= 1-1
+      dut.io.rg_para.zp #= 16-1
+      dut.io.rg_para.k #= 16-1
+      dut.io.rg_para.shxhat #= 6-1
+      dut.io.rg_para.xyzs #= 60-1
+      sleep(10)
+
+      println("test")
+      dut.clockDomain.waitSampling()
+      dut.io.start_conv #= true
+      dut.clockDomain.waitSampling()
+      dut.io.pe_flags.ps_rd_ready #= true
+      dut.clockDomain.waitSampling()
+      dut.io.pe_flags.ps_wr_ready #= true
+
+      //dut.clockDomain.waitSamplingWhere(dut.io.subconv_finish.toBoolean)
+        
+      sleep(1000)
+
+
+    }
+
+  }
+}

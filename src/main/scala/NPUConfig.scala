@@ -16,7 +16,7 @@ case class NPUConfig(
                 PE_PSUM_WD :  Int = 32,
                 PE_PSUM_NUM:  Int = 128,
                 PE_SCALE_WD:  Int = 8,
-                PE_USE_BOOTH: Boolean = true,
+                PE_USE_BOOTH: Boolean = false,
                 PE_MUL_Vender: Mulvendor = SimpleMulVendor,   //SimpleMulVendor, MultiplierIPVendor
     // PE array config
                 ARRAY_COL_NUM: Int = 16,

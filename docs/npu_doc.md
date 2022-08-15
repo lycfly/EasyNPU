@@ -22,18 +22,18 @@ PE单元只负责实现基本的运算，有如下控制信号负责控制PE的�
 
 <center>
 
-| Name                | Width | Function                                                 |
-| :------------------ | :---- | :------------------------------------------------------- |
-| Pe_ps_addr          | 6     | Psum Regfile addr                                        |
-| Pe_ps_pinA_outer_en | 1     | 外部Psum使能, 用于累加Bias, 作用于加法器的A端            |
-| Pe_ps_pinB_outer_en | 1     | 外部Psum使能, 用于累加Bias, 作用于加法器的B端            |
-| Pe_ps_back_en       | 1     | Psum结果回环使能，控制Psum经定点化后是否送到到乘法器输入 |
-| Pe_scale_qnt_en     | 1     | Psum量化使能                                             |
-| Pe_maxpool_en       | 1     | Maxpool模式使能开关                                      |
-| Pe_byp_mul_en       | 1     | 乘法器旁路使能开关                                       |
-| Ps_rd               | 1     | psum regfile 读使能                                      |
-| Ps_allow_rd         | 1     | psum regfile 可读使能                                    |
-| Ps_wr               | 1     | psum regfile 写使能                                      |
+| Name               | Width | Function                                                 |
+| :----------------- | :---- | :------------------------------------------------------- |
+| Pe_ps_addr         | 6     | Psum Regfile addr                                        |
+| Pe_ps_pinA_bias_en | 1     | 外部Psum使能, 用于累加Bias, 作用于加法器的A端            |
+| Pe_ps_pinB_bias_en | 1     | 外部Psum使能, 用于累加Bias, 作用于加法器的B端            |
+| Pe_ps_back_en      | 1     | Psum结果回环使能，控制Psum经定点化后是否送到到乘法器输入 |
+| Pe_scale_qnt_en    | 1     | Psum量化使能                                             |
+| Pe_maxpool_en      | 1     | Maxpool模式使能开关                                      |
+| Pe_byp_mul_en      | 1     | 乘法器旁路使能开关                                       |
+| Ps_rd              | 1     | psum regfile 读使能                                      |
+| Ps_allow_rd        | 1     | psum regfile 可读使能                                    |
+| Ps_wr              | 1     | psum regfile 写使能                                      |
 
 </center>
 
@@ -181,7 +181,6 @@ for(i = 0; i < B; i += b)               // Batch tiling
 + 对于某些简单的推理任务，例如串行的音频流数据，Batch Size通常可以直接取1。因此上面的卷积循环可以忽略最外层的Batch循环。
 
 外层的四层循环我们将其交给总控制器完成，PE控制器主要负责内层的循环，也就是计算下图所示的部分卷积：
-
 
 <center>
 <img src="images/pe_pass_ctrl.drawio.svg" width = "600" height = "400" alt="ifmap ctrl"/>
@@ -423,9 +422,9 @@ for(i = 0; i < B; i += b)               // Batch tiling
           if(kz == Ci-1){
             oyi = PE_Ctrl_oyi
             oxi = PE_Ctrl_oxi
-            ozi = PE_Ctrl_ozi  // iterator of zs tiling                 
+            ozi = PE_Ctrl_ozi  // iterator of zs tiling               
             FMAP_DTCM[i][oy+oyi][ox+oxi][oz+ozi*zp:oz+(ozi+1)*zp-1] 
-              = Ofmap_bus         
+              = Ofmap_bus       
           }
 ```
 
@@ -466,7 +465,7 @@ for(i = 0; i < B; i += b)               // Batch tiling
           for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
             for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
               for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
-        
+      
                 weight_bus =
                 Weight_DTCM[kz+kzi][hki][wki][oz+ozi*zp:oz+(ozi+1)*zp-1] 
         }   
