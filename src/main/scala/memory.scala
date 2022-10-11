@@ -5,6 +5,8 @@ import spinal.lib._
 case class MemConfig(
                    DATAWD: Int ,
                    SIZE: Int ,
+                   RD_NUM: Int,
+                   WR_NUM: Int,
                    MemVender: MEMVender
 
 ){
@@ -45,6 +47,20 @@ case class Ram1r1w(mc: MemConfig, memName: String = "") extends Component{
    noIoPrefix()
   val ram = mc.MemVender.build(this, mc)
 }
+
+case class RamNrNw(mc: MemConfig, memName: String = "") extends Component{
+  val io = new Bundle{
+
+    val wr     = in Vec(Bool(), mc.WR_NUM)
+    val rd     = in Vec(Bool(), mc.RD_NUM)
+    val waddr  = in Vec(UInt(mc.ADDRWD bits), mc.WR_NUM)
+    val wdata  = in Vec(Bits(mc.DATAWD bits), mc.WR_NUM)
+    val raddr  = in Vec(UInt(mc.ADDRWD bits), mc.RD_NUM)
+    val rdata  = out Vec(Bits(mc.DATAWD bits), mc.RD_NUM)
+  }
+   noIoPrefix()
+  val ram = mc.MemVender.build(this, mc)
+}
 // case class Ram2rw(mc: MemConfig, memName: String = "") extends Component with MemWrap{
 //   val io = new Bundle{
 //     val Aclk  = in Bool()
@@ -67,6 +83,7 @@ case class Ram1r1w(mc: MemConfig, memName: String = "") extends Component{
 trait MEMVender {
   def build(mw: Ram1rw, mc :MemConfig): Component = new regMem1rw(mw, mc).Build()
   def build(mw: Ram1r1w, mc :MemConfig): Component = new regMem1r1w(mw, mc).Build()
+  def build(mw: RamNrNw, mc :MemConfig): Component = new regMemNrNw(mw, mc).Build()
 
 }
 case object REGMEM extends MEMVender
@@ -130,6 +147,41 @@ class regMem1r1w(wrap: Ram1r1w, mc :MemConfig) extends Component{  //1r1w
     this.io.readValid    := wrap.io.rd
     this.io.waddress      := wrap.io.waddr 
     this.io.raddress      := wrap.io.raddr
+    this.io.writeData    := wrap.io.wdata
+    wrap.io.rdata        := this.io.readData
+    this
+  }
+  noIoPrefix()
+}
+class regMemNrNw(wrap: RamNrNw, mc :MemConfig) extends Component{  //1r1w
+  val io = new Bundle { 
+    val writeValid = in Vec(Bool(), mc.WR_NUM)
+    val readValid  = in Vec(Bool(), mc.RD_NUM)
+    val waddress   = in Vec(UInt(mc.ADDRWD bits), mc.WR_NUM)
+    val writeData  = in Vec(Bits(mc.DATAWD bits), mc.WR_NUM)
+    val raddress   = in Vec(UInt(mc.ADDRWD bits), mc.RD_NUM)
+    val readData   = out Vec(Bits(mc.DATAWD bits), mc.RD_NUM)
+  }
+  val mem = Mem(Bits(mc.DATAWD bits), wordCount = mc.SIZE)
+
+  for(i <- 0 to mc.RD_NUM-1){
+    mem.write(
+    enable  = io.writeValid(i),
+    address = io.waddress(i),
+    data    = io.writeData(i)
+    )
+    io.readData(i) := mem.readSync(
+      enable  = io.readValid(i),
+      address = io.raddress(i)
+    )
+  }
+
+  
+  def Build(): Component = {
+    this.io.writeValid   := wrap.io.wr
+    this.io.readValid    := wrap.io.rd
+    this.io.waddress     := wrap.io.waddr 
+    this.io.raddress     := wrap.io.raddr
     this.io.writeData    := wrap.io.wdata
     wrap.io.rdata        := this.io.readData
     this
@@ -210,9 +262,11 @@ object mem_gen_test {
       targetDirectory = "rtl"
       )
     //  .withoutEnumString()
-      .generate(new Ram1rw(MemConfig( 
+      .generate(new RamNrNw(MemConfig( 
                    DATAWD = 32,
                    SIZE = 128 ,
+                   RD_NUM = 2,
+                   WR_NUM = 2,
                    MemVender = IPMEM)))
     }.printPruned()
 }

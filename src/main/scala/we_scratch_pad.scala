@@ -20,7 +20,7 @@ case class Wescp_ctrl_bus (cfg: NPUConfig) extends Wescp_ctrl(cfg) with IMasterS
 
 class We_scratch_pad (cfg: NPUConfig) extends Component{
     val io = new Bundle {
-    val wescp_wbus = slave(RF_wbus(cfg.WESCP_ADDRWD, cfg.WESCP_BUS_WD))
+    val wescp_wbus = slave(RF_wbus(cfg.WESCP_ADDRWD, cfg.WESCP_BUS_WD, 1))
     val wescp_ctrl = slave(Wescp_ctrl_bus(cfg))
     val we_pe_bus  = out Vec(Bits(cfg.PE_WEIGHT_WD bits), cfg.ARRAY_COL_NUM)
     val bias_pe_bus  = out Vec(Bits(cfg.PE_BIAS_WD bits), cfg.ARRAY_COL_NUM)
@@ -28,19 +28,19 @@ class We_scratch_pad (cfg: NPUConfig) extends Component{
 
   }
   noIoPrefix()
-  val We_rf = ArrayBuffer.fill(cfg.ARRAY_COL_NUM)(regfile(DATAWD = cfg.PE_WEIGHT_WD, SIZE = cfg.WESCP_SIZE))
-  val Bs_rf = ArrayBuffer.fill(cfg.ARRAY_COL_NUM, cfg.BIAS_BYTE_NUM + 1)(regfile(DATAWD = cfg.PE_WEIGHT_WD,  SIZE = cfg.SCALE_SIZE))
+  val We_rf = ArrayBuffer.fill(cfg.ARRAY_COL_NUM)(regfile(DATAWD = cfg.PE_WEIGHT_WD, SIZE = cfg.WESCP_SIZE,1,1))
+  val Bs_rf = ArrayBuffer.fill(cfg.ARRAY_COL_NUM, cfg.BIAS_BYTE_NUM + 1)(regfile(DATAWD = cfg.PE_WEIGHT_WD,  SIZE = cfg.SCALE_SIZE, 1, 1))
   
   
-  val wewdata = io.wescp_wbus.wdata.subdivideIn(cfg.ARRAY_COL_NUM slices)
+  val wewdata = io.wescp_wbus.wdata(0).subdivideIn(cfg.ARRAY_COL_NUM slices)
   for(i <- 0 until cfg.ARRAY_COL_NUM){
-      We_rf(i).io.wbus.wr := io.wescp_wbus.wr
-      We_rf(i).io.wbus.waddr := io.wescp_wbus.waddr
-      We_rf(i).io.wbus.wdata := wewdata(i)
+      We_rf(i).io.wbus.wr(0) := io.wescp_wbus.wr(0)
+      We_rf(i).io.wbus.waddr(0) := io.wescp_wbus.waddr(0)
+      We_rf(i).io.wbus.wdata(0) := wewdata(i)
 
-      We_rf(i).io.rbus.raddr := io.wescp_ctrl.och_gcnt
-      We_rf(i).io.rbus.rd := io.wescp_ctrl.we_rd
-      io.we_pe_bus(i) := We_rf(i).io.rbus.rdata
+      We_rf(i).io.rbus.raddr(0) := io.wescp_ctrl.och_gcnt
+      We_rf(i).io.rbus.rd(0) := io.wescp_ctrl.we_rd
+      io.we_pe_bus(i) := We_rf(i).io.rbus.rdata(0)
   }
 
   // val bias_byte_cnt = Reg(UInt(log2Up(cfg.BIAS_BYTE_NUM) bits))
@@ -64,21 +64,21 @@ class We_scratch_pad (cfg: NPUConfig) extends Component{
   }
   for(i <- 0 until cfg.ARRAY_COL_NUM){
     for(j <- 0 until (cfg.BIAS_BYTE_NUM+1)){
-      Bs_rf(i)(j).io.wbus.wr :=  bs_wr_byte_sel(j) & io.wescp_wbus.wr
-      Bs_rf(i)(j).io.wbus.waddr := io.wescp_wbus.waddr
-      Bs_rf(i)(j).io.wbus.wdata := wewdata(i)
+      Bs_rf(i)(j).io.wbus.wr(0) :=  bs_wr_byte_sel(j) & io.wescp_wbus.wr(0)
+      Bs_rf(i)(j).io.wbus.waddr(0) := io.wescp_wbus.waddr(0)
+      Bs_rf(i)(j).io.wbus.wdata(0) := wewdata(i)
 
-      Bs_rf(i)(j).io.rbus.raddr := io.wescp_ctrl.och_gcnt
+      Bs_rf(i)(j).io.rbus.raddr(0) := io.wescp_ctrl.och_gcnt
 
       if(j < cfg.BIAS_BYTE_NUM){
-        Bs_rf(i)(j).io.rbus.rd := io.wescp_ctrl.bs_rd
-        io.bias_pe_bus(i)((j+1)*cfg.PE_WEIGHT_WD-1 downto j*cfg.PE_WEIGHT_WD) := Bs_rf(i)(j).io.rbus.rdata
+        Bs_rf(i)(j).io.rbus.rd(0) := io.wescp_ctrl.bs_rd
+        io.bias_pe_bus(i)((j+1)*cfg.PE_WEIGHT_WD-1 downto j*cfg.PE_WEIGHT_WD) := Bs_rf(i)(j).io.rbus.rdata(0)
       }
       else{
-        Bs_rf(i)(j).io.rbus.rd := io.wescp_ctrl.sc_rd
+        Bs_rf(i)(j).io.rbus.rd(0) := io.wescp_ctrl.sc_rd
       }
   }
-  io.scale_pe_bus(i) := Bs_rf(i)(cfg.BIAS_BYTE_NUM).io.rbus.rdata
+  io.scale_pe_bus(i) := Bs_rf(i)(cfg.BIAS_BYTE_NUM).io.rbus.rdata(0)
 
 
 }

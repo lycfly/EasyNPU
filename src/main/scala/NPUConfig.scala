@@ -20,6 +20,7 @@ case class NPUConfig(
                 PE_MUL_Vender: Mulvendor = SimpleMulVendor,   //SimpleMulVendor, MultiplierIPVendor
     // PE array config
                 ARRAY_COL_NUM: Int = 16,
+                CLUSTER_LINE_NUM: Int = 4,   
     // IFmap scratch pad config
                 IFSCP_SIZE:   Int = 64,
     // Weight scratch pad config

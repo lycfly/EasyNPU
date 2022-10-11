@@ -1,7 +1,7 @@
 name := "EasyNPU"
 version := "1.0"
 scalaVersion := "2.11.12"
-val spinalVersion = "1.7.1"
+val spinalVersion = "1.7.2"
 
 libraryDependencies ++= Seq(
   "org.scalanlp" % "breeze_2.11" % "0.12",

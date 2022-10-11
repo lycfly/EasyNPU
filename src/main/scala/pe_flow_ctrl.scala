@@ -124,16 +124,16 @@ class pe_flow_ctrl (cfg: NPUConfig) extends Component{
         ifscp_ctrl_rgs.cast_mode.clear()  // common conv mode
         // ifmap and weight addr 
         when(oxi_sigs.this_ov){
-          ifscp_ctrl_rgs.hw_addr := ifscp_ctrl_rgs.hw_addr + (io.rg_para.shxhat + 1)
+          ifscp_ctrl_rgs.hw_addr(0) := ifscp_ctrl_rgs.hw_addr(0) + (io.rg_para.shxhat + 1)
         }.elsewhen(oyi_sigs.this_ov){
-          ifscp_ctrl_rgs.hw_addr.clearAll()
+          ifscp_ctrl_rgs.hw_addr(0).clearAll()
         }.otherwise{
-          ifscp_ctrl_rgs.hw_addr := ifscp_ctrl_rgs.hw_addr + (io.rg_para.sw.resize(cfg.IFSCP_ADDRWD))
+          ifscp_ctrl_rgs.hw_addr(0) := ifscp_ctrl_rgs.hw_addr(0) + (io.rg_para.sw.resize(cfg.IFSCP_ADDRWD))
         }
         ifscp_ctrl_rgs.ich_addr := kzi.io.cnt
         wescp_ctrl_rgs.och_gcnt := ozi.io.cnt
         // ifmap and weight rd
-        ifscp_ctrl_rgs.if_rd.set()
+        ifscp_ctrl_rgs.if_rd(0).set()
         wescp_ctrl_rgs.we_rd.set()
         // psum ctrl
         pe_ctrl_rgs.ps_wr    :=  io.pe_flags.ps_wr_ready

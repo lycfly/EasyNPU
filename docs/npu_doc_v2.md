@@ -166,25 +166,54 @@ Weight的scratch pad与Ifmap类似，同样分成16组，只不过每组的条�
 
 
 ```C++
-for(i = 0; i < B; i += b)               // Batch tiling
-  for(oz = 0; oz < Co; oz += z)         // Output Channel tiling
-    for(oy = 0; oy < Ho; oy += y)       // Output Row tiling
-      for(ox = 0; ox < Wo; ox += x)    // Output column tiling
-        for(kz = 0; kz < Ci; kz += k)  // Inner tiling
-          for(kzi = 0; kzi < k; kzi ++)     // Inner input channel tiling
-            for(hki = 0; hki < Hk; hki ++)        // Inner Kernel Row tiling 
-              for(wki = 0; wki < Wk; wki ++)      // Inner Kernel Column tiling 
+def mod(a, bound){
+  if(a < bound)
+    return 0
+  else if(a >= bound && a < 2*bound)
+    return 1
+  else if(a >= 2*bound && a < 3*bound)
+    return 2
+  else if(a >= 3*bound && a < 4*bound)
+    return 3
+}
+
+def next_oxyi(oxi,oyi){
+  linum = mod(oxi + (4), ox)
+  oxi_next = oxi + (4) - ox*linum
+  oyi_next += linum
+  return oxi_next, oyi_next
+}
+
+def loopinc(max_num, cnt, step){
+  return (max_num-cnt >= step ? step : max_num-cnt)
+}
+
+for(i = 0; i < B; i += loopinc(B,i,b))                 // Batch tiling
+  for(oz = 0; oz < Co; oz += loopinc(Co,oz,z))         // Output Channel tiling
+    for(oy = 0; oy < Ho; oy += loopinc(Ho,oy,y))       // Output Row tiling
+      for(ox = 0; ox < Wo; ox += loopinc(Wo,ox,x))     // Output column tiling
+        for(kz = 0; kz < Ci; kz += loopinc(Ci,kz,k))   // Inner tiling
+          for(kzi = 0; kzi < k; kzi ++)                // Inner input channel tiling
+            for(hki = 0; hki < Hk; hki ++)             // Inner Kernel Row tiling 
+              for(wki = 0; wki < Wk; wki ++)           // Inner Kernel Column tiling 
+                oxi(0,1,2,3) = 0,1,2,3
+                oyi(0,1,2,3) = 0,0,0,0
+                oxi,oyi = next_oxyi(oxi,oyi)
                 for(oxyi = 0; oxyi < ceil(x*y/4); oxyi++)// Inner Output Row tiling
-                  for(ozi = 0; ozi < zs; ozi ++)        // Inner Output Channel tiling 
-                    xyi = oxyi << 2
-                    if(oxyi >= x) 
-                      oyi += 1
+                  for(ozi = 0; ozi < zs; ozi ++)         // Inner Output Channel tiling 
+                    for(line = 0; line < 4; line++){     // unroll
+                      oxi_next(line), oyi_next(line)= next_oxyi(oxi(line),oyi(line))
+                      if(oxi(line) <= ox && oyi(line) <= oy){
                         // Every PE's behavior is same
                         weight_bus = Weight_DTCM[kz+kzi][hki][wki][oz+ozi*zp:oz+(ozi+1)*zp-1] 
 
                         PEs_ifmap_in=IF_PAD[kzi][sh*oyi][sw*oxi]
                         PEs_weight_in=W_PAD[ozi]
                         Psum_PADs[ozi][oyi][oxi] += PEs_ifmap_in * PEs_weight_in
+
+                        oxi = oxi_next
+                        oyi = oyi_next
+                      }
                 }
 ```
 

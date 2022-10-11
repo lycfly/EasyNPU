@@ -171,7 +171,12 @@ class pe_unit (cfg: NPUConfig) extends Component {
   qnt.io.enable := io.pe_ctrl.ps_scale_en
 
   // Psum 
-  val Ps_rgfile = new Ram1r1w(MemConfig(DATAWD = cfg.PE_PSUM_WD,SIZE = cfg.PE_PSUM_NUM,MemVender = REGMEM))
+  val Ps_rgfile = new Ram1r1w(
+                              MemConfig(DATAWD = cfg.PE_PSUM_WD,
+                              SIZE = cfg.PE_PSUM_NUM,
+                              RD_NUM = 1,
+                              WR_NUM = 1,
+                              MemVender = REGMEM))
   val ps_rf_rdata = Flow(SInt(cfg.PE_PSUM_WD bits))
   val ps_true_rd_en = Bool()
   ps_true_rd_en := io.pe_ctrl.ps_rd & io.pe_ctrl.ps_allow_rd
