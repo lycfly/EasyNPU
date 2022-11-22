@@ -256,7 +256,7 @@ object SignMultiplierInst {
         resetActiveLevel = LOW),
       mode=Verilog).generate(new SignMultiplier(SIZEINA = 8, SIZEINB = 8))
 
-
+ 
   }
 }
 object booth4_inst {
